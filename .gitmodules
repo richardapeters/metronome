@@ -1,12 +1,12 @@
 [submodule "EmbeddedInfraLib"]
 	path = EmbeddedInfraLib
-	url = C:\\Users\\Richard Peters\\OneDrive - Philips\\EmbeddedInfraLib.git
+	url = ../EmbeddedInfraLib.git
 	branch = develop
 [submodule "HalSt"]
 	path = HalSt
-	url = C:\\Users\\Richard Peters\\OneDrive - Philips\\HalSt.git
+	url = ../HalSt.git
 	branch = develop
 [submodule "Preview"]
 	path = Preview
-	url = C:\\Users\\Richard Peters\\OneDrive - Philips\\Preview.git
+	url = ../Preview.git
 	branch = develop
