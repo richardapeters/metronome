@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 include("${CCOLA_DIR}/ccola.inc")
 
 ccola_programmer(
-    j-link
+    cubeide-j-link
 )
 
 ccola_project(Train)
@@ -19,7 +19,6 @@ ccola_project(Train)
         EmbeddedInfraLib/infra
         EmbeddedInfraLib/hal
         EmbeddedInfraLib/services
-        EmbeddedInfraLib/lwip
         HalSt/hal_st
         Preview/external/SDL2-2.0.5
         Preview/preview
