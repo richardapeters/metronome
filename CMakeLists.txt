@@ -19,9 +19,11 @@ ccola_project(Train)
         EmbeddedInfraLib/infra
         EmbeddedInfraLib/hal
         EmbeddedInfraLib/services
+        EmbeddedInfraLib/lwip
         HalSt/hal_st
         Preview/external/SDL2-2.0.5
         Preview/preview
+        local_hal
         metronome
     )
 
