@@ -13,7 +13,6 @@ ccola_programmer(
 ccola_project(Train)
 
     ccola_subdirectories(
-        EmbeddedInfraLib/external/args
         EmbeddedInfraLib/external/googletest
         EmbeddedInfraLib/external/crypto
         EmbeddedInfraLib/infra
