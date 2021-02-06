@@ -3,7 +3,7 @@
 namespace application
 {
     BeatControllerImpl::BeatControllerImpl(BeatTimer& beatTimer)
-        : beatTimer(beatTimer)
+        : BeatTimerObserver(beatTimer)
     {}
 
     void BeatControllerImpl::SetBpm(uint16_t newBpm)
@@ -18,23 +18,45 @@ namespace application
         if (Running())
             Stop();
 
-        beat.Start(std::chrono::microseconds(60000000 / bpm), [this]() { Beat(); });
-        beatTimer.Start(bpm);
+        running = true;
+        PrepareNextBeat();
+        BeatTimerObserver::Subject().Start(bpm);
     }
 
     void BeatControllerImpl::Stop()
     {
-        beatTimer.Stop();
-        beat.Cancel();
+        running = false;
+        BeatTimerObserver::Subject().Stop();
+        prepareBeat.Cancel();
     }
 
     bool BeatControllerImpl::Running() const
     {
-        return beat.Armed();
+        return running;
     }
 
     void BeatControllerImpl::Beat()
     {
-        NotifyObservers([](BeatControllerObserver& observer) { observer.PrepareBeat(); });
+        MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
+        PrepareNextBeat();
+
+        beatOff.Start(std::chrono::milliseconds(30), [this]() { BeatController::GetObserver().BeatOff(); });
+    }
+
+    void BeatControllerImpl::PrepareNextBeat()
+    {
+        holdPaint.Start(std::chrono::microseconds(60000000 / bpm) - std::chrono::milliseconds(160), [this]()
+        {
+            MetronomePainterSubject::GetObserver().StopAutomaticPainting();
+        });
+
+        prepareBeat.Start(std::chrono::microseconds(60000000 / bpm) - std::chrono::milliseconds(80), [this]()
+        {
+            BeatController::GetObserver().BeatOn();
+            auto start = infra::Now();
+            MetronomePainterSubject::GetObserver().ManualPaint();
+            auto duration = infra::Now() - start;
+            //services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+        });
     }
 }

@@ -11,7 +11,6 @@
 #include "metronome/main_stm32f746/Rtc.hpp"
 #include "metronome/main_stm32f746/Touch.hpp"
 #include "metronome/main_stm32f746/Tracer.hpp"
-#include "preview/interfaces/BitmapCanvas.hpp"
 #include "preview/interfaces/ViewPainterDoubleBufferDisplay.hpp"
 #include "preview/stm32fxxx/BitmapPainterStm.hpp"
 #include "services/tracer/GlobalTracer.hpp"
@@ -29,54 +28,18 @@ extern "C" void Default_Handler()
     hal::InterruptTable::Instance().Invoke(hal::ActiveInterrupt());
 }
 
-namespace application
-{
-    class ViewPainterMetronome
-    {
-    public:
-        ViewPainterMetronome(hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter);
-
-        void Paint(services::View& view);
-        void SwapLayers(infra::Function<void()> onDone);
-
-    private:
-        hal::DoubleBufferDisplay& display;
-        hal::BitmapPainter& bitmapPainter;
-    };
-}
-
-namespace application
-{
-    ViewPainterMetronome::ViewPainterMetronome(hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter)
-        : display(display)
-        , bitmapPainter(bitmapPainter)
-    {}
-
-    void ViewPainterMetronome::Paint(services::View& view)
-    {
-        services::BitmapCanvas canvas(display.DrawingBitmap(), bitmapPainter);
-        view.Paint(canvas, view.ViewRegion());
-        bitmapPainter.WaitUntilDrawingFinished();
-    }
-
-    void ViewPainterMetronome::SwapLayers(infra::Function<void()> onDone)
-    {
-        display.SwapLayers(onDone);
-    }
-}
-
-void ContinuouslyPaint(application::ViewPainterMetronome& viewPainter, services::View& view)
-{
-    //auto start = infra::Now();
-    viewPainter.Paint(view);
-    //auto duration = infra::Now() - start;
-    //services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-    viewPainter.SwapLayers([&viewPainter, &view]()
-    {
-        static infra::TimerSingleShot repaintTimer;
-        repaintTimer.Start(std::chrono::milliseconds(50), [&viewPainter, &view]() { ContinuouslyPaint(viewPainter, view); });
-    });
-}
+//void ContinuouslyPaint(application::ViewPainterMetronome& viewPainter)
+//{
+//    //auto start = infra::Now();
+//    viewPainter.Paint();
+//    //auto duration = infra::Now() - start;
+//    //services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+//    viewPainter.SwapLayers([&viewPainter]()
+//    {
+//        static infra::TimerSingleShot repaintTimer;
+//        repaintTimer.Start(std::chrono::milliseconds(50), [&viewPainter]() { ContinuouslyPaint(viewPainter); });
+//    });
+//}
 
 void ConfigureSaiClock()
 {
@@ -173,8 +136,9 @@ void SaiBeatTimer::Stop()
 
 void SaiBeatTimer::Reload()
 {
-    hal::LowPowerTimer::Reload();
     sai.Transfer(click);
+    hal::LowPowerTimer::Reload();
+    GetObserver().Beat();
 }
 
 int main()
@@ -193,9 +157,6 @@ int main()
 
     static main_::Rtc rtc;
 
-    static hal::BitmapPainterStm bitmapPainter;
-    static application::ViewPainterMetronome viewPainter(lcd.lcd, bitmapPainter);
-
     static main_::PeripheralI2c peripheralI2c;
 
     static hal::GpioPinStm mclock(hal::Port::I, 4);
@@ -207,14 +168,9 @@ int main()
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
         static SaiBeatTimer beatTimer(sai, click);
-        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer);
-        ContinuouslyPaint(viewPainter, metronome.touch.GetView());
+        static hal::BitmapPainterStm bitmapPainter;
+        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
-
-        //static hal::LowPowerTimerAlternatingReload lowPowerTimer;
-        //lowPowerTimer.Start();
-
-        //static infra::TimerRepeating tick(std::chrono::milliseconds(500), []() { sai.Transfer(click); });
     });
 
     eventDispatcher.Run();

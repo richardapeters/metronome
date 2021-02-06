@@ -133,9 +133,59 @@ class BeatTimerStub
     : public application::BeatTimer
 {
 public:
-    virtual void Start(uint16_t bpm) override {}
-    virtual void Stop() override {}
+    virtual void Start(uint16_t bpm) override;
+    virtual void Stop() override;
+
+private:
+    infra::TimerRepeating timer;
 };
+
+void BeatTimerStub::Start(uint16_t bpm)
+{
+    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]() { GetObserver().Beat(); });
+}
+
+void BeatTimerStub::Stop()
+{
+    timer.Cancel();
+}
+
+class DisplayAdapter
+    : public hal::DoubleBufferDisplay
+{
+public:
+    DisplayAdapter(hal::DirectDisplay& display);
+
+    virtual void SwapLayers(const infra::Function<void()>& onDone) override;
+    virtual infra::Bitmap& DrawingBitmap() override;
+    virtual const infra::Bitmap& ViewingBitmap() const override;
+
+private:
+    hal::DirectDisplay& display;
+    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> drawingBitmap;
+    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> viewingBitmap;
+};
+
+DisplayAdapter::DisplayAdapter(hal::DirectDisplay& display)
+    : display(display)
+{}
+
+void DisplayAdapter::SwapLayers(const infra::Function<void()>& onDone)
+{
+    std::swap(drawingBitmap, viewingBitmap);
+    display.DrawBitmap(infra::Point(), viewingBitmap, infra::Region(infra::Point(), display.Size()));
+    onDone();
+}
+
+infra::Bitmap& DisplayAdapter::DrawingBitmap()
+{
+    return drawingBitmap;
+}
+
+const infra::Bitmap& DisplayAdapter::ViewingBitmap() const
+{
+    return viewingBitmap;
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -147,7 +197,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     hal::DirectDisplaySdl display(infra::Vector(480, 272));
 
     BeatTimerStub beatTimer;
-    main_::Metronome metronome(display.Size(), localTime, beatTimer);
+    DisplayAdapter displayAdapter(display);
+    hal::BitmapPainterCanonical bitmapPainter;
+    main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter);
     services::SdlTouchInteractor touchInteractor(lowPowerStrategy, metronome.touch);
 
     services::ViewPainterDirectDisplay viewPainter(display);

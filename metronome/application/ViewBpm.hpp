@@ -55,7 +55,8 @@ namespace application
         virtual void SetBpm(uint16_t bpm) override;
 
         // Implementation of BeatControllerObserver
-        virtual void PrepareBeat() override;
+        virtual void BeatOn() override;
+        virtual void BeatOff() override;
 
     private:
         void DrawSprocket(hal::Canvas& canvas, infra::Region boundingRegion, int sprocket) const;
@@ -63,9 +64,6 @@ namespace application
 
     private:
         infra::BoundedString::WithStorage<4> bpm;
-        uint16_t proportion;
-        infra::TimerRepeating rollOff;
-
         infra::Colour backgroundColour = infra::Colour::white;
 
         enum class TouchMode

@@ -6,14 +6,38 @@
 
 namespace application
 {
-    class BeatTimer
-    {
-    protected:
-        BeatTimer() = default;
-        BeatTimer(const BeatTimer& other) = delete;
-        BeatTimer& operator=(const BeatTimer& other) = delete;
-        ~BeatTimer() = default;
+    class MetronomePainterSubject;
 
+    class MetronomePainter
+        : public infra::SingleObserver<MetronomePainter, MetronomePainterSubject>
+    {
+    public:
+        using infra::SingleObserver<MetronomePainter, MetronomePainterSubject>::SingleObserver;
+
+        virtual void StopAutomaticPainting() = 0;
+        virtual void StartAutomaticPainting() = 0;
+        virtual void ManualPaint() = 0;
+        virtual void SwapLayers(infra::Function<void()> onDone) = 0;
+    };
+
+    class MetronomePainterSubject
+        : public infra::Subject<MetronomePainter>
+    {};
+
+    class BeatTimer;
+
+    class BeatTimerObserver
+        : public infra::SingleObserver<BeatTimerObserver, BeatTimer>
+    {
+    public:
+        using infra::SingleObserver<BeatTimerObserver, BeatTimer>::SingleObserver;
+
+        virtual void Beat() = 0;
+    };
+
+    class BeatTimer
+        : public infra::Subject<BeatTimerObserver>
+    {
     public:
         virtual void Start(uint16_t bpm) = 0;
         virtual void Stop() = 0;
@@ -22,12 +46,13 @@ namespace application
     class BeatController;
 
     class BeatControllerObserver
-        : public infra::Observer<BeatControllerObserver, BeatController>
+        : public infra::SingleObserver<BeatControllerObserver, BeatController>
     {
     public:
-        using infra::Observer<BeatControllerObserver, BeatController>::Observer;
+        using infra::SingleObserver<BeatControllerObserver, BeatController>::SingleObserver;
 
-        virtual void PrepareBeat() = 0;
+        virtual void BeatOn() = 0;
+        virtual void BeatOff() = 0;
     };
 
     class BeatController
@@ -42,6 +67,8 @@ namespace application
 
     class BeatControllerImpl
         : public BeatController
+        , public BeatTimerObserver
+        , public MetronomePainterSubject
     {
     public:
         BeatControllerImpl(BeatTimer& beatTimer);
@@ -51,13 +78,17 @@ namespace application
         virtual void Stop() override;
         virtual bool Running() const override;
 
-    private:
-        void Beat();
+        virtual void Beat() override;
 
     private:
-        BeatTimer& beatTimer;
-        infra::TimerRepeating beat;
+        void PrepareNextBeat();
+
+    private:
+        infra::TimerSingleShot holdPaint;
+        infra::TimerSingleShot prepareBeat;
+        infra::TimerSingleShot beatOff;
         uint16_t bpm;
+        bool running = false;
     };
 }
 

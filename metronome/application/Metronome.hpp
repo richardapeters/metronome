@@ -7,7 +7,10 @@
 #include "metronome/application/ViewBpm.hpp"
 #include "metronome/application/ViewDateEntry.hpp"
 #include "metronome/application/ViewNoteKind.hpp"
+#include "metronome/application/ViewPainterMetronome.hpp"
 #include "metronome/application/ViewTapMeasurement.hpp"
+#include "preview/interfaces/DoubleBufferDisplay.hpp"
+#include "preview/interfaces/BitmapPainter.hpp"
 #include "preview/touch/TouchButton.hpp"
 #include "preview/touch/TouchHorizontalLayout.hpp"
 #include "preview/touch/TouchPanel.hpp"
@@ -20,13 +23,14 @@ namespace main_
 {
     struct Metronome
     {
-        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer);
+        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter);
 
         void StartTimeEntry();
         void StopTimeEntry(infra::TimePoint newTime);
 
         application::BeatControllerImpl beatController;
         services::TouchViewMultiple::WithMaxViews<2> touch;
+        application::ViewPainterMetronome viewPainter;
         services::TouchHorizontalLayout::WithMaxViews<2> touchBpm;
         application::ViewBpm viewBpm{ beatController };
         application::BpmSelectionInteractor bpmSelectionObserver{ viewBpm, beatController };

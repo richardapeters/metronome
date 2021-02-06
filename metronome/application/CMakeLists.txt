@@ -23,6 +23,8 @@ ccola_component(application static_library)
         ViewDateEntry.hpp
         ViewNoteKind.cpp
         ViewNoteKind.hpp
+        ViewPainterMetronome.cpp
+        ViewPainterMetronome.hpp
         ViewTapMeasurement.cpp
         ViewTapMeasurement.hpp
         Wm8994.cpp

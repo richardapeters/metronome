@@ -143,19 +143,16 @@ namespace application
         Dirty(ViewRegion());
     }
 
-    void ViewBpm::PrepareBeat()
+    void ViewBpm::BeatOn()
     {
-        proportion = 0;
-        rollOff.Start(std::chrono::milliseconds(35), [this]()
-        {
-            backgroundColour = BetweenColour(infra::Colour::red, infra::Colour::white, proportion);
-            if (proportion == 256)
-                rollOff.Cancel();
-            else
-                proportion += 64;
+        backgroundColour = infra::Colour::red;
+        Dirty(ViewRegion());
+    }
 
-            Dirty(ViewRegion());
-        }, infra::triggerImmediately);
+    void ViewBpm::BeatOff()
+    {
+        backgroundColour = infra::Colour::white;
+        Dirty(ViewRegion());
     }
 
     void ViewBpm::DrawSprocket(hal::Canvas& canvas, infra::Region boundingRegion, int sprocket) const
