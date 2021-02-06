@@ -137,6 +137,46 @@ infra::ConstByteRange ReadClick(const WavHeader header, infra::ConstByteRange da
 
 infra::MemoryRange<const uint16_t> click(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
 
+class SaiBeatTimer
+    : public application::BeatTimer
+    , private hal::LowPowerTimer
+{
+public:
+    SaiBeatTimer(hal::SaiStm& sai, infra::MemoryRange<const uint16_t> data);
+
+    virtual void Start(uint16_t bpm) override;
+    virtual void Stop() override;
+
+private:
+    virtual void Reload() override;
+
+private:
+    hal::SaiStm& sai;
+    infra::MemoryRange<const uint16_t> data;
+};
+
+SaiBeatTimer::SaiBeatTimer(hal::SaiStm& sai, infra::MemoryRange<const uint16_t> data)
+    : sai(sai)
+    , data(data)
+{}
+
+void SaiBeatTimer::Start(uint16_t bpm)
+{
+    SetReload(std::min(32768 * 60 / bpm, 65535));
+    hal::LowPowerTimer::Start();
+}
+
+void SaiBeatTimer::Stop()
+{
+    hal::LowPowerTimer::Stop();
+}
+
+void SaiBeatTimer::Reload()
+{
+    hal::LowPowerTimer::Reload();
+    sai.Transfer(click);
+}
+
 int main()
 {
     static hal::InterruptTable::WithStorage<128> interruptTable;
@@ -156,15 +196,7 @@ int main()
     static hal::BitmapPainterStm bitmapPainter;
     static application::ViewPainterMetronome viewPainter(lcd.lcd, bitmapPainter);
 
-    static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc);
-
-    ContinuouslyPaint(viewPainter, metronome.touch.GetView());
-
     static main_::PeripheralI2c peripheralI2c;
-    static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
-
-    static hal::LowPowerTimerAlternatingReload lowPowerTimer;
-    lowPowerTimer.Start();
 
     static hal::GpioPinStm mclock(hal::Port::I, 4);
     static hal::GpioPinStm sck(hal::Port::I, 5);
@@ -174,7 +206,15 @@ int main()
 
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
-        static infra::TimerRepeating tick(std::chrono::milliseconds(500), []() { sai.Transfer(click); });
+        static SaiBeatTimer beatTimer(sai, click);
+        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer);
+        ContinuouslyPaint(viewPainter, metronome.touch.GetView());
+        static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
+
+        //static hal::LowPowerTimerAlternatingReload lowPowerTimer;
+        //lowPowerTimer.Start();
+
+        //static infra::TimerRepeating tick(std::chrono::milliseconds(500), []() { sai.Transfer(click); });
     });
 
     eventDispatcher.Run();

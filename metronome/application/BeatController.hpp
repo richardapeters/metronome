@@ -6,6 +6,19 @@
 
 namespace application
 {
+    class BeatTimer
+    {
+    protected:
+        BeatTimer() = default;
+        BeatTimer(const BeatTimer& other) = delete;
+        BeatTimer& operator=(const BeatTimer& other) = delete;
+        ~BeatTimer() = default;
+
+    public:
+        virtual void Start(uint16_t bpm) = 0;
+        virtual void Stop() = 0;
+    };
+
     class BeatController;
 
     class BeatControllerObserver
@@ -31,6 +44,8 @@ namespace application
         : public BeatController
     {
     public:
+        BeatControllerImpl(BeatTimer& beatTimer);
+
         virtual void SetBpm(uint16_t newBpm) override;
         virtual void Start() override;
         virtual void Stop() override;
@@ -40,6 +55,7 @@ namespace application
         void Beat();
 
     private:
+        BeatTimer& beatTimer;
         infra::TimerRepeating beat;
         uint16_t bpm;
     };

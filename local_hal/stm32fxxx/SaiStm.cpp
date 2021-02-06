@@ -40,6 +40,7 @@ namespace hal
 
     void SaiStm::Transfer(infra::MemoryRange<const uint16_t> data)
     {
+        tx.StopTransfer();
         tx.StartTransmit(infra::ReinterpretCastByteRange(data));
         saiBlockHandle->CR1 |= SAI_xCR1_DMAEN;
     }

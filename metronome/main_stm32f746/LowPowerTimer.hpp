@@ -14,6 +14,7 @@ namespace hal
 
         void SetReload(uint32_t reload);
         void Start();
+        void Stop();
         infra::TimePoint Now() const;
 
     protected:
@@ -22,22 +23,8 @@ namespace hal
     private:
         infra::TimePoint now = infra::TimePoint();
         hal::ImmediateInterruptHandler timerInterrupt{ LPTIM1_IRQn, [this]() { Reload(); } };
-        uint32_t reload = 0;
-        uint32_t previousReload = 0;
-    };
-
-    class LowPowerTimerAlternatingReload
-        : public LowPowerTimer
-    {
-    public:
-        LowPowerTimerAlternatingReload();
-
-    protected:
-        virtual void Reload() override;
-
-    private:
-        int i = 0;
-        std::array<int, 2> reload{ { 16384, 32768 } };
+        uint32_t reload = 32768;
+        uint32_t previousReload = reload;
     };
 }
 

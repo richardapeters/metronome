@@ -5,8 +5,9 @@
 
 namespace main_
 {
-    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime)
-        : viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
+    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer)
+        : beatController(beatTimer)
+        , viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
         , localTime(localTime)
     {
         touch.Add(touchBpm);

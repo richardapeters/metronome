@@ -129,6 +129,14 @@ private:
     infra::Duration shift = infra::Duration();
 };
 
+class BeatTimerStub
+    : public application::BeatTimer
+{
+public:
+    virtual void Start(uint16_t bpm) override {}
+    virtual void Stop() override {}
+};
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     hal::TimerServiceGeneric timerService;
@@ -138,7 +146,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     hal::DirectDisplaySdl display(infra::Vector(480, 272));
 
-    main_::Metronome metronome(display.Size(), localTime);
+    BeatTimerStub beatTimer;
+    main_::Metronome metronome(display.Size(), localTime, beatTimer);
     services::SdlTouchInteractor touchInteractor(lowPowerStrategy, metronome.touch);
 
     services::ViewPainterDirectDisplay viewPainter(display);

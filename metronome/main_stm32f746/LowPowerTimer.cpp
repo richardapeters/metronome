@@ -15,7 +15,7 @@ namespace hal
 
         LPTIM1->CR = LPTIM_CR_ENABLE;
         LPTIM1->CFGR = 0;
-        LPTIM1->ARR = 32768;
+        LPTIM1->ARR = reload;
         LPTIM1->IER = LPTIM_IER_ARRMIE;
     }
 
@@ -37,6 +37,12 @@ namespace hal
         LPTIM1->CR = LPTIM_CR_CNTSTRT | LPTIM_CR_ENABLE;
     }
 
+    void LowPowerTimer::Stop()
+    {
+        LPTIM1->CR = 0;
+        LPTIM1->CR = LPTIM_CR_ENABLE;
+    }
+
     infra::TimePoint LowPowerTimer::Now() const
     {
         return now + std::chrono::microseconds(LPTIM1->CR * 1000000 / 32768);
@@ -47,22 +53,5 @@ namespace hal
         LPTIM1->ICR = LPTIM_ICR_ARRMCF;
         now += std::chrono::microseconds(previousReload * 1000000 / 32768);
         previousReload = reload;
-    }
-
-    LowPowerTimerAlternatingReload::LowPowerTimerAlternatingReload()
-    {
-        SetReload(reload[i]);
-    }
-
-    void LowPowerTimerAlternatingReload::Reload()
-    {
-        SetReload(reload[i]);
-        LowPowerTimer::Reload();
-
-        auto x = i;
-        infra::EventDispatcher::Instance().Schedule([x]() { services::GlobalTracer().Trace() << "Setting reload: " << x; });
-        ++i;
-        if (i == reload.size())
-            i = 0;
     }
 }

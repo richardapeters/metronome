@@ -2,6 +2,10 @@
 
 namespace application
 {
+    BeatControllerImpl::BeatControllerImpl(BeatTimer& beatTimer)
+        : beatTimer(beatTimer)
+    {}
+
     void BeatControllerImpl::SetBpm(uint16_t newBpm)
     {
         bpm = newBpm;
@@ -11,11 +15,16 @@ namespace application
 
     void BeatControllerImpl::Start()
     {
+        if (Running())
+            Stop();
+
         beat.Start(std::chrono::microseconds(60000000 / bpm), [this]() { Beat(); });
+        beatTimer.Start(bpm);
     }
 
     void BeatControllerImpl::Stop()
     {
+        beatTimer.Stop();
         beat.Cancel();
     }
 

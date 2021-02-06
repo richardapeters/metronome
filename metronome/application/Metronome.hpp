@@ -20,7 +20,7 @@ namespace main_
 {
     struct Metronome
     {
-        Metronome(infra::Vector size, services::SettableTimerService& localTime);
+        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer);
 
         void StartTimeEntry();
         void StopTimeEntry(infra::TimePoint newTime);
