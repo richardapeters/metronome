@@ -75,6 +75,7 @@ namespace application
             {
                 if (infra::Distance(point, *startTouch) > static_cast<uint16_t>(ViewRegion().Size().deltaY / 6))
                 {
+                    auto startSelectedSprocket = selectedSprocket;
                     selectedSprocket = 0;
                     auto selectedSprocketDistance = infra::Distance(point, SprocketCentre(*selectedSprocket));
                     for (int sprocket = 1; sprocket != 8; ++sprocket)
@@ -83,28 +84,40 @@ namespace application
                             selectedSprocket = sprocket;
                             selectedSprocketDistance = infra::Distance(point, SprocketCentre(*selectedSprocket));
                         }
+
+                    if (selectedSprocket != startSelectedSprocket)
+                        Dirty(ViewRegion());
                 }
-                else
+                else if (selectedSprocket != infra::none)
+                {
                     selectedSprocket = infra::none;
+                    Dirty(ViewRegion());
+                }
                 break;
             }
             case TouchMode::bpmMulti:
             {
                 auto steps = (point.x - startTouch->x) / (ViewRegion().Size().deltaX / 4) - stepsReported;
-                stepsReported += steps;
-                NotifyObservers([steps](BpmSelectionObserver& observer) { observer.MultiStep(steps); });
+                if (steps != 0)
+                {
+                    stepsReported += steps;
+                    NotifyObservers([steps](BpmSelectionObserver& observer) { observer.MultiStep(steps); });
+                    Dirty(ViewRegion());
+                }
                 break;
             }
             case TouchMode::bpmSingle:
             {
                 auto steps = (startTouch->y - point.y) / (ViewRegion().Size().deltaY / 20) - stepsReported;
-                stepsReported += steps;
-                NotifyObservers([steps](BpmSelectionObserver& observer) { observer.SingleStep(steps); });
+                if (steps != 0)
+                {
+                    stepsReported += steps;
+                    NotifyObservers([steps](BpmSelectionObserver& observer) { observer.SingleStep(steps); });
+                    Dirty(ViewRegion());
+                }
                 break;
             }
         }
-
-        Dirty(ViewRegion());
     }
 
     void ViewBpm::DragOut()
