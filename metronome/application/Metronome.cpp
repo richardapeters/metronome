@@ -5,7 +5,7 @@
 
 namespace main_
 {
-    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter)
+    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter)
         : beatController(beatTimer)
         , viewPainter(display, bitmapPainter, touch.GetView(), beatController)
         , viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })

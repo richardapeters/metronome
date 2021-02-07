@@ -2,7 +2,7 @@
 
 namespace application
 {
-    BeatControllerImpl::BeatControllerImpl(BeatTimer& beatTimer)
+    BeatControllerImpl::BeatControllerImpl(MetronomeBeatTimer& beatTimer)
         : BeatTimerObserver(beatTimer)
     {}
 

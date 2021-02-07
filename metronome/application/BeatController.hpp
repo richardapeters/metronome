@@ -24,18 +24,18 @@ namespace application
         : public infra::Subject<MetronomePainter>
     {};
 
-    class BeatTimer;
+    class MetronomeBeatTimer;
 
     class BeatTimerObserver
-        : public infra::SingleObserver<BeatTimerObserver, BeatTimer>
+        : public infra::SingleObserver<BeatTimerObserver, MetronomeBeatTimer>
     {
     public:
-        using infra::SingleObserver<BeatTimerObserver, BeatTimer>::SingleObserver;
+        using infra::SingleObserver<BeatTimerObserver, MetronomeBeatTimer>::SingleObserver;
 
         virtual void Beat() = 0;
     };
 
-    class BeatTimer
+    class MetronomeBeatTimer
         : public infra::Subject<BeatTimerObserver>
     {
     public:
@@ -71,7 +71,7 @@ namespace application
         , public MetronomePainterSubject
     {
     public:
-        BeatControllerImpl(BeatTimer& beatTimer);
+        BeatControllerImpl(MetronomeBeatTimer& beatTimer);
 
         virtual void SetBpm(uint16_t newBpm) override;
         virtual void Start() override;

@@ -130,7 +130,7 @@ private:
 };
 
 class BeatTimerStub
-    : public application::BeatTimer
+    : public application::MetronomeBeatTimer
 {
 public:
     virtual void Start(uint16_t bpm) override;

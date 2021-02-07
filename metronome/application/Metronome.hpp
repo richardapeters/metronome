@@ -23,7 +23,7 @@ namespace main_
 {
     struct Metronome
     {
-        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter);
+        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter);
 
         void StartTimeEntry();
         void StopTimeEntry(infra::TimePoint newTime);

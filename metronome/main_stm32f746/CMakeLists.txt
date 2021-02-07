@@ -8,7 +8,11 @@ ccola_component(main_stm32f746 stm32f746: executable other: noncompile)
         LowPowerTimer.cpp
         LowPowerTimer.hpp
         Main.cpp
+        MetronomeBeatTimerStm.cpp
+        MetronomeBeatTimerStm.hpp
         PeripheralI2c.hpp
+        Sai.cpp
+        Sai.hpp
         Touch.cpp
         Touch.hpp
         Tracer.cpp
