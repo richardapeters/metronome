@@ -20,7 +20,6 @@ namespace application
         virtual void BpmSelected(uint16_t bpm) = 0;
         virtual void SingleStep(int steps) = 0;
         virtual void MultiStep(int steps) = 0;
-        virtual void ToggleStart() = 0;
     };
 
     class BpmSelection
@@ -76,7 +75,6 @@ namespace application
         } mode;
 
         infra::Optional<infra::Point> startTouch;
-        bool touchRemainedAtStart;
         infra::Optional<int> selectedSprocket;
         int stepsReported;
 

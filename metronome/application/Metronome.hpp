@@ -8,6 +8,7 @@
 #include "metronome/application/ViewDateEntry.hpp"
 #include "metronome/application/ViewNoteKind.hpp"
 #include "metronome/application/ViewPainterMetronome.hpp"
+#include "metronome/application/ViewStart.hpp"
 #include "metronome/application/ViewTapMeasurement.hpp"
 #include "preview/interfaces/DoubleBufferDisplay.hpp"
 #include "preview/interfaces/BitmapPainter.hpp"
@@ -35,8 +36,10 @@ namespace main_
         application::ViewBpm viewBpm{ beatController };
         application::BpmSelectionInteractor bpmSelectionObserver{ viewBpm, beatController };
         services::TouchVerticalLayout::WithMaxViews<3> touchVertical;
+        services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalTop;
+        application::ViewStart viewStart{ beatController, infra::Colour::lightGray };
         application::ViewTapMeasurement viewTapMeasurement{ bpmSelectionObserver, infra::Colour::lightGray, infra::Colour::darkGray };
-        services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalRight;
+        services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalMid;
         services::TouchPanel::WithView<application::ViewBeatsPerMeasure> viewBeatsPerMeasure{ infra::Colour::lightGray };
         services::TouchPanel::WithView<application::ViewNoteKind> viewNoteKind{ infra::Colour::lightGray };
         services::TouchButton::With<services::ViewButtonPanel::WithView<services::ViewCurrentTime>> viewCurrentTime;

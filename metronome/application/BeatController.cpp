@@ -20,6 +20,9 @@ namespace application
 
         running = true;
         PrepareNextBeat();
+        MetronomePainterSubject::GetObserver().StopAutomaticPainting();
+        BeatController::GetObserver().BeatOn();
+        MetronomePainterSubject::GetObserver().ManualPaint();
         BeatTimerObserver::Subject().Start(bpm);
     }
 

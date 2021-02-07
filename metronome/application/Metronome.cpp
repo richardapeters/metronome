@@ -14,10 +14,12 @@ namespace main_
         touch.Add(touchBpm);
         touchBpm.AddFill(viewBpm, size.deltaY);
         touchBpm.AddFill(touchVertical, size.deltaX - size.deltaY);
-        touchVertical.AddFill(viewTapMeasurement, 1);
-        touchVertical.AddFill(touchHorizontalRight, 3);
-        touchHorizontalRight.AddFill(viewBeatsPerMeasure, 1);
-        touchHorizontalRight.AddFill(viewNoteKind, 1);
+        touchVertical.AddFill(touchHorizontalTop, 1);
+        touchHorizontalTop.AddFill(viewStart, 1);
+        touchHorizontalTop.AddFill(viewTapMeasurement, 1);
+        touchVertical.AddFill(touchHorizontalMid, 3);
+        touchHorizontalMid.AddFill(viewBeatsPerMeasure, 1);
+        touchHorizontalMid.AddFill(viewNoteKind, 1);
         touchVertical.AddFill(viewCurrentTime, 1);
         touch.GetView().ResetLayout(size);
     }

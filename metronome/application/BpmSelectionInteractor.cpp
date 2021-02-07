@@ -31,17 +31,9 @@ namespace application
         Update();
     }
 
-    void BpmSelectionInteractor::ToggleStart()
-    {
-        if (beatController.Running())
-            beatController.Stop();
-        else
-            beatController.Start();
-    }
-
     void BpmSelectionInteractor::Update()
     {
-        bpm = std::min(300, std::max(30, bpm + 0));
+        bpm = std::min(300, std::max(40, bpm + 0));
 
         Subject().SetBpm(bpm);
         beatController.SetBpm(bpm);

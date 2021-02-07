@@ -54,7 +54,6 @@ namespace application
         }
 
         startTouch = point;
-        touchRemainedAtStart = true;
 
         Dirty(ViewRegion());
     }
@@ -66,9 +65,6 @@ namespace application
 
     void ViewBpm::DragTo(infra::Point point)
     {
-        if (infra::Distance(point, *startTouch) > static_cast<uint16_t>(ViewRegion().Size().deltaY / 16))
-            touchRemainedAtStart = false;
-
         switch (mode)
         {
             case TouchMode::wheel:
@@ -129,9 +125,6 @@ namespace application
     {
         if (mode == TouchMode::wheel && selectedSprocket != infra::none)
             NotifyObservers([this](BpmSelectionObserver& observer) { observer.BpmSelected(sprocketValues[*selectedSprocket]); });
-
-        if (touchRemainedAtStart)
-            NotifyObservers([](BpmSelectionObserver& observer) { observer.ToggleStart(); });
 
         mode = TouchMode::idle;
         startTouch = infra::none;

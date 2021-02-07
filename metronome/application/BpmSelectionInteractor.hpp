@@ -14,7 +14,6 @@ namespace application
         virtual void BpmSelected(uint16_t selectedBpm) override;
         virtual void SingleStep(int steps) override;
         virtual void MultiStep(int steps) override;
-        virtual void ToggleStart() override;
 
     private:
         void Update();

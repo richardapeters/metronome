@@ -12,8 +12,8 @@ namespace application
     {
         this->bpm = std::max<uint16_t>(bpm, 31); // Ensure step <= 65536
 
-        SetNextReload();
         hal::LowPowerTimer::Start();
+        Reload();
     }
 
     void MetronomeBeatTimerStm::Stop()

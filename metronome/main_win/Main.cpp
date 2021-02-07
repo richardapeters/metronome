@@ -142,7 +142,7 @@ private:
 
 void BeatTimerStub::Start(uint16_t bpm)
 {
-    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]() { GetObserver().Beat(); });
+    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]() { GetObserver().Beat(); }, infra::triggerImmediately);
 }
 
 void BeatTimerStub::Stop()
