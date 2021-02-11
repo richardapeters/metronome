@@ -43,9 +43,6 @@ struct WavHeader
     uint32_t dataLength;
 };
 
-extern WavHeader click_start;
-extern uint8_t click_end;
-
 bool StringArrayEqual(infra::MemoryRange<const char> array, infra::BoundedConstString string)
 {
     return infra::BoundedConstString(array.begin(), array.size()) == string;
@@ -64,6 +61,14 @@ infra::ConstByteRange ReadClick(const WavHeader header, infra::ConstByteRange da
     return infra::Head(infra::DiscardHead(data, sizeof(header)), header.dataLength);
 }
 
+extern WavHeader click_accent_start;
+extern uint8_t click_accent_end;
+
+extern WavHeader click_start;
+extern uint8_t click_end;
+
+//infra::MemoryRange<const uint16_t> clickAccent(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_accent_start, { reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end })));
+infra::MemoryRange<const uint16_t> clickAccent(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_start) + std::distance( reinterpret_cast<const uint8_t*>(&click_start),  reinterpret_cast<const uint8_t*>(&click_end)) / 4 })));
 infra::MemoryRange<const uint16_t> click(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
 
 int main()
@@ -85,7 +90,7 @@ int main()
 
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
-        static application::MetronomeBeatTimerStm beatTimer(sai.controller, click);
+        static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);

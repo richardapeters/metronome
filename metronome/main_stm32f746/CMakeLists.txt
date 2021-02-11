@@ -19,6 +19,7 @@ ccola_component(main_stm32f746 stm32f746: executable other: noncompile)
         Tracer.hpp
     )
 
+    ccola_add_binary(ClickAccent.wav click_accent)
     ccola_add_binary(Click.wav click)
 
     ccola_dependencies(

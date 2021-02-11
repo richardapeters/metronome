@@ -2,6 +2,7 @@
 #define METRONOME_BEAT_CONTROLLER_HPP
 
 #include "infra/util/Observer.hpp"
+#include "infra/util/Optional.hpp"
 #include "infra/timer/Timer.hpp"
 
 namespace application
@@ -39,7 +40,7 @@ namespace application
         : public infra::Subject<BeatTimerObserver>
     {
     public:
-        virtual void Start(uint16_t bpm) = 0;
+        virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) = 0;
         virtual void Stop() = 0;
     };
 
@@ -63,6 +64,9 @@ namespace application
         virtual void Start() = 0;
         virtual void Stop() = 0;
         virtual bool Running() const = 0;
+
+        virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) = 0;
+        virtual void DisabledBeatsPerMinute() = 0;
     };
 
     class BeatControllerImpl
@@ -77,6 +81,8 @@ namespace application
         virtual void Start() override;
         virtual void Stop() override;
         virtual bool Running() const override;
+        virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) override;
+        virtual void DisabledBeatsPerMinute() override;
 
         virtual void Beat() override;
 
@@ -89,6 +95,7 @@ namespace application
         infra::TimerSingleShot beatOff;
         uint16_t bpm;
         bool running = false;
+        infra::Optional<uint8_t> beatsPerMeasure;
     };
 }
 

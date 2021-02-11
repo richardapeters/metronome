@@ -23,7 +23,7 @@ namespace application
         MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         BeatController::GetObserver().BeatOn();
         MetronomePainterSubject::GetObserver().ManualPaint();
-        BeatTimerObserver::Subject().Start(bpm);
+        BeatTimerObserver::Subject().Start(bpm, beatsPerMeasure);
     }
 
     void BeatControllerImpl::Stop()
@@ -36,6 +36,22 @@ namespace application
     bool BeatControllerImpl::Running() const
     {
         return running;
+    }
+
+    void BeatControllerImpl::SelectedBeatsPerMeasure(uint8_t beatsPerMeasure)
+    {
+        this->beatsPerMeasure = beatsPerMeasure;
+
+        if (Running())
+            Start();
+    }
+
+    void BeatControllerImpl::DisabledBeatsPerMinute()
+    {
+        beatsPerMeasure = infra::none;
+
+        if (Running())
+            Start();
     }
 
     void BeatControllerImpl::Beat()

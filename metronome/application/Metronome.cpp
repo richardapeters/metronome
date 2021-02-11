@@ -3,6 +3,26 @@
 #include "metronome/application/NoteFont.hpp"
 #include "preview/fonts/Fonts.hpp"
 
+namespace application
+{
+    BeatsPerMeasureInteractor::BeatsPerMeasureInteractor(ViewBeatsPerMeasure& subject, BeatController& beatController)
+        : ViewBeatsPerMeasureObserver(subject)
+        , beatController(beatController)
+    {
+        beatController.SelectedBeatsPerMeasure(Subject().Value());
+    }
+
+    void BeatsPerMeasureInteractor::SelectedBeatsPerMeasure(uint8_t beatsPerMeasure)
+    {
+        beatController.SelectedBeatsPerMeasure(beatsPerMeasure);
+    }
+
+    void BeatsPerMeasureInteractor::DisabledBeatsPerMinute()
+    {
+        beatController.DisabledBeatsPerMinute();
+    }
+}
+
 namespace main_
 {
     Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter)

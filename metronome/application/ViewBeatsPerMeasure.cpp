@@ -28,6 +28,11 @@ namespace application
         {
             enabled = !enabled;
             GetView().Enable(enabled);
+
+            if (!enabled)
+                NotifyObservers([](ViewBeatsPerMeasureObserver& observer) { observer.DisabledBeatsPerMinute(); });
+            else
+                NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
         }
     }
 
@@ -36,6 +41,11 @@ namespace application
         Parent::Report(steps, from);
 
         if (steps != 0)
+        {
             touchRemainedAtStart = false;
+
+            if (enabled)
+                NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
+        }
     }
 }

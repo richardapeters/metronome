@@ -133,14 +133,14 @@ class BeatTimerStub
     : public application::MetronomeBeatTimer
 {
 public:
-    virtual void Start(uint16_t bpm) override;
+    virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) override;
     virtual void Stop() override;
 
 private:
     infra::TimerRepeating timer;
 };
 
-void BeatTimerStub::Start(uint16_t bpm)
+void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
 {
     timer.Start(std::chrono::microseconds(60000000 / bpm), [this]() { GetObserver().Beat(); }, infra::triggerImmediately);
 }

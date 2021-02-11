@@ -20,6 +20,22 @@
 #include "preview/views/ViewButtonPanel.hpp"
 #include "preview/views/ViewCurrentTime.hpp"
 
+namespace application
+{
+    class BeatsPerMeasureInteractor
+        : public ViewBeatsPerMeasureObserver
+    {
+    public:
+        BeatsPerMeasureInteractor(ViewBeatsPerMeasure& subject, BeatController& beatController);
+
+        virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) override;
+        virtual void DisabledBeatsPerMinute() override;
+
+    private:
+        BeatController& beatController;
+    };
+}
+
 namespace main_
 {
     struct Metronome
@@ -43,6 +59,7 @@ namespace main_
         services::TouchPanel::WithView<application::ViewBeatsPerMeasure> viewBeatsPerMeasure{ infra::Colour::lightGray };
         services::TouchPanel::WithView<application::ViewNoteKind> viewNoteKind{ infra::Colour::lightGray };
         services::TouchButton::With<services::ViewButtonPanel::WithView<services::ViewCurrentTime>> viewCurrentTime;
+        application::BeatsPerMeasureInteractor beatsPerMeasureInteractor{ viewBeatsPerMeasure.SubView(), beatController };
 
         services::SettableTimerService& localTime;
         infra::Optional<services::TouchAligned::WithView<application::ViewDateEntry>> dateEntry;

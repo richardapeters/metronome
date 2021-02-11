@@ -3,14 +3,18 @@
 
 namespace application
 {
-    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const uint16_t> data)
+    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const uint16_t> dataAccent, infra::MemoryRange<const uint16_t> data)
         : sai(sai)
+        , dataAccent(dataAccent)
         , data(data)
     {}
 
-    void MetronomeBeatTimerStm::Start(uint16_t bpm)
+    void MetronomeBeatTimerStm::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
     {
         this->bpm = std::max<uint16_t>(bpm, 31); // Ensure step <= 65536
+        this->beatsPerMeasure = beatsPerMeasure;
+
+        currentBeat = 0;
 
         hal::LowPowerTimer::Start();
         Reload();
@@ -25,10 +29,21 @@ namespace application
 
     void MetronomeBeatTimerStm::Reload()
     {
-        sai.Transfer(data);
+    	if (beatsPerMeasure != infra::none && currentBeat == 0)
+    		sai.Transfer(dataAccent);
+    	else
+    		sai.Transfer(data);
+
         SetNextReload();
         hal::LowPowerTimer::Reload();
         GetObserver().Beat();
+
+        if (beatsPerMeasure != infra::none)
+        {
+        	++currentBeat;
+        	if (currentBeat == beatsPerMeasure)
+        		currentBeat = 0;
+        }
     }
 
     void MetronomeBeatTimerStm::SetNextReload()
