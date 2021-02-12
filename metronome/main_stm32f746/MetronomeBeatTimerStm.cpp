@@ -1,9 +1,8 @@
 #include "metronome/main_stm32f746/MetronomeBeatTimerStm.hpp"
-#include "services/tracer/GlobalTracer.hpp"
 
 namespace application
 {
-    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const uint16_t> dataAccent, infra::MemoryRange<const uint16_t> data)
+    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const int16_t> dataAccent, infra::MemoryRange<const int16_t> data)
         : sai(sai)
         , dataAccent(dataAccent)
         , data(data)
@@ -29,10 +28,10 @@ namespace application
 
     void MetronomeBeatTimerStm::Reload()
     {
-    	if (beatsPerMeasure != infra::none && currentBeat == 0)
-    		sai.Transfer(dataAccent);
-    	else
-    		sai.Transfer(data);
+        if (beatsPerMeasure != infra::none && currentBeat == 0)
+            sai.Transfer(dataAccent);
+        else
+            sai.Transfer(data);
 
         SetNextReload();
         hal::LowPowerTimer::Reload();
@@ -40,9 +39,9 @@ namespace application
 
         if (beatsPerMeasure != infra::none)
         {
-        	++currentBeat;
-        	if (currentBeat == beatsPerMeasure)
-        		currentBeat = 0;
+            ++currentBeat;
+            if (currentBeat == beatsPerMeasure)
+                currentBeat = 0;
         }
     }
 
@@ -62,8 +61,6 @@ namespace application
             ++step;
         else if (cumulative + step + amount * step > total)
             --step;
-
-        services::GlobalTracer().Trace() << "Step: " << step << " amount: " << amount;
 
         cumulative += step;
 

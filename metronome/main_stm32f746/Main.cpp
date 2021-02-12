@@ -61,15 +61,26 @@ infra::ConstByteRange ReadClick(const WavHeader header, infra::ConstByteRange da
     return infra::Head(infra::DiscardHead(data, sizeof(header)), header.dataLength);
 }
 
+infra::MemoryRange<const int16_t> CreateSoftClick(infra::MemoryRange<const int16_t> click)
+{
+    auto block = reinterpret_cast<int16_t*>(malloc(click.size() * sizeof(int16_t)));
+    infra::MemoryRange<int16_t> result(block, block + click.size());
+
+    for (auto i = 0; i != click.size(); ++i)
+        result[i] = click[i] / 2;
+
+    return result;
+}
+
 extern WavHeader click_accent_start;
 extern uint8_t click_accent_end;
 
 extern WavHeader click_start;
 extern uint8_t click_end;
 
-//infra::MemoryRange<const uint16_t> clickAccent(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_accent_start, { reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end })));
-infra::MemoryRange<const uint16_t> clickAccent(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_start) + std::distance( reinterpret_cast<const uint8_t*>(&click_start),  reinterpret_cast<const uint8_t*>(&click_end)) / 4 })));
-infra::MemoryRange<const uint16_t> click(infra::ReinterpretCastMemoryRange<const uint16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
+//infra::MemoryRange<const int16_t> clickAccent(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_accent_start, { reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end })));
+infra::MemoryRange<const int16_t> clickAccent(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_start) + std::distance(reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_end)) / 4 })));
+infra::MemoryRange<const int16_t> click(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
 
 int main()
 {
@@ -88,9 +99,11 @@ int main()
     static main_::PeripheralI2c peripheralI2c;
     static main_::Sai sai(dma);
 
+    static infra::MemoryRange<const int16_t> softClick = CreateSoftClick(click);
+
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
-        static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click);
+        static application::MetronomeBeatTimerStm beatTimer(sai.controller, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);

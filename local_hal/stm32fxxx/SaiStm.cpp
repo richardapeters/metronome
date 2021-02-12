@@ -38,7 +38,7 @@ namespace hal
         DisableClockSai(instance);
     }
 
-    void SaiStm::Transfer(infra::MemoryRange<const uint16_t> data)
+    void SaiStm::Transfer(infra::MemoryRange<const int16_t> data)
     {
         tx.StopTransfer();
         tx.StartTransmit(infra::ReinterpretCastByteRange(data));

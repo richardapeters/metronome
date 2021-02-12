@@ -24,7 +24,7 @@ namespace hal
         SaiStm(uint8_t oneBasedIndex, SaiB, GpioPinStm& mclock, GpioPinStm& sck, GpioPinStm& sd, GpioPinStm& fs, DmaStm& dma);
         ~SaiStm();
 
-        void Transfer(infra::MemoryRange<const uint16_t> data);
+        void Transfer(infra::MemoryRange<const int16_t> data);
 
     private:
         void Init();
