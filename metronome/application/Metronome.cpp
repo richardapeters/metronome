@@ -21,6 +21,18 @@ namespace application
     {
         beatController.DisabledBeatsPerMinute();
     }
+
+    NoteKindInteractor::NoteKindInteractor(ViewNoteKind& subject, BeatController& beatController)
+        : ViewNoteKindObserver(subject)
+        , beatController(beatController)
+    {
+        beatController.SelectedNoteKind(Subject().Value());
+    }
+
+    void NoteKindInteractor::SelectedNoteKind(uint8_t noteKind)
+    {
+        beatController.SelectedNoteKind(noteKind);
+    }
 }
 
 namespace main_

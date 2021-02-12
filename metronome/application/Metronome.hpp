@@ -34,6 +34,18 @@ namespace application
     private:
         BeatController& beatController;
     };
+
+    class NoteKindInteractor
+        : public ViewNoteKindObserver
+    {
+    public:
+        NoteKindInteractor(ViewNoteKind& subject, BeatController& beatController);
+
+        virtual void SelectedNoteKind(uint8_t noteKind) override;
+
+    private:
+        BeatController& beatController;
+    };
 }
 
 namespace main_
@@ -60,6 +72,7 @@ namespace main_
         services::TouchPanel::WithView<application::ViewNoteKind> viewNoteKind{ infra::Colour::lightGray };
         services::TouchButton::With<services::ViewButtonPanel::WithView<services::ViewCurrentTime>> viewCurrentTime;
         application::BeatsPerMeasureInteractor beatsPerMeasureInteractor{ viewBeatsPerMeasure.SubView(), beatController };
+        application::NoteKindInteractor noteKindInteractor{ viewNoteKind.SubView(), beatController };
 
         services::SettableTimerService& localTime;
         infra::Optional<services::TouchAligned::WithView<application::ViewDateEntry>> dateEntry;

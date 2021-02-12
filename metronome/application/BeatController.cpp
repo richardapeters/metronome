@@ -23,7 +23,7 @@ namespace application
         MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         BeatController::GetObserver().BeatOn();
         MetronomePainterSubject::GetObserver().ManualPaint();
-        BeatTimerObserver::Subject().Start(bpm, beatsPerMeasure);
+        BeatTimerObserver::Subject().Start(bpm, beatsPerMeasure, noteKind);
     }
 
     void BeatControllerImpl::Stop()
@@ -49,6 +49,14 @@ namespace application
     void BeatControllerImpl::DisabledBeatsPerMinute()
     {
         beatsPerMeasure = infra::none;
+
+        if (Running())
+            Start();
+    }
+
+    void BeatControllerImpl::SelectedNoteKind(uint8_t noteKind)
+    {
+        this->noteKind = noteKind;
 
         if (Running())
             Start();

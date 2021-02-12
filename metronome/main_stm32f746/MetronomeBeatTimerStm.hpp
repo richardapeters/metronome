@@ -12,9 +12,9 @@ namespace application
         , private hal::LowPowerTimer
     {
     public:
-        MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const int16_t> dataAccent, infra::MemoryRange<const int16_t> data);
+        MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const int16_t> dataAccent, infra::MemoryRange<const int16_t> data, infra::MemoryRange<const int16_t> dataSub);
 
-        virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) override;
+        virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) override;
         virtual void Stop() override;
 
     protected:
@@ -27,9 +27,11 @@ namespace application
         hal::SaiStm& sai;
         infra::MemoryRange<const int16_t> dataAccent;
         infra::MemoryRange<const int16_t> data;
+        infra::MemoryRange<const int16_t> dataSub;
 
         uint16_t bpm;
         infra::Optional<uint8_t> beatsPerMeasure;
+        uint8_t noteKind;
 
         uint32_t step;
         uint32_t amount = 0;

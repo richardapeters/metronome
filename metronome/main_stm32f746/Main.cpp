@@ -103,7 +103,7 @@ int main()
 
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
-        static application::MetronomeBeatTimerStm beatTimer(sai.controller, click, softClick);
+        static application::MetronomeBeatTimerStm beatTimer(sai.controller, click, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);

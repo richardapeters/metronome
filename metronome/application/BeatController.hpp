@@ -40,7 +40,7 @@ namespace application
         : public infra::Subject<BeatTimerObserver>
     {
     public:
-        virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) = 0;
+        virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) = 0;
         virtual void Stop() = 0;
     };
 
@@ -67,6 +67,7 @@ namespace application
 
         virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) = 0;
         virtual void DisabledBeatsPerMinute() = 0;
+        virtual void SelectedNoteKind(uint8_t noteKind) = 0;
     };
 
     class BeatControllerImpl
@@ -83,6 +84,7 @@ namespace application
         virtual bool Running() const override;
         virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) override;
         virtual void DisabledBeatsPerMinute() override;
+        virtual void SelectedNoteKind(uint8_t noteKind) override;
 
         virtual void Beat() override;
 
@@ -96,6 +98,7 @@ namespace application
         uint16_t bpm;
         bool running = false;
         infra::Optional<uint8_t> beatsPerMeasure;
+        uint8_t noteKind = 0;
     };
 }
 

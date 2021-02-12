@@ -2,16 +2,24 @@
 
 namespace application
 {
-    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const int16_t> dataAccent, infra::MemoryRange<const int16_t> data)
+    namespace
+    {
+        static const std::array<uint8_t, 5> subSteps{ 1, 1, 1, 2, 3 };
+        static const std::array<uint8_t, 5> superSteps{ 100, 2, 1, 1, 1 };
+    }
+
+    MetronomeBeatTimerStm::MetronomeBeatTimerStm(hal::SaiStm& sai, infra::MemoryRange<const int16_t> dataAccent, infra::MemoryRange<const int16_t> data, infra::MemoryRange<const int16_t> dataSub)
         : sai(sai)
         , dataAccent(dataAccent)
         , data(data)
+        , dataSub(dataSub)
     {}
 
-    void MetronomeBeatTimerStm::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
+    void MetronomeBeatTimerStm::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind)
     {
         this->bpm = std::max<uint16_t>(bpm, 31); // Ensure step <= 65536
         this->beatsPerMeasure = beatsPerMeasure;
+        this->noteKind = noteKind;
 
         currentBeat = 0;
 
@@ -30,17 +38,24 @@ namespace application
     {
         if (beatsPerMeasure != infra::none && currentBeat == 0)
             sai.Transfer(dataAccent);
+        else if (currentBeat % subSteps[noteKind] == 0)
+        {
+            if (currentBeat % superSteps[noteKind] == 0)
+                sai.Transfer(data);
+        }
         else
-            sai.Transfer(data);
+            sai.Transfer(dataSub);
 
         SetNextReload();
         hal::LowPowerTimer::Reload();
-        GetObserver().Beat();
+
+        if (currentBeat % subSteps[noteKind] == 0)
+            GetObserver().Beat();
 
         if (beatsPerMeasure != infra::none)
         {
             ++currentBeat;
-            if (currentBeat == beatsPerMeasure)
+            if (currentBeat == *beatsPerMeasure * subSteps[noteKind])
                 currentBeat = 0;
         }
     }
@@ -50,7 +65,7 @@ namespace application
         if (amount == 0)
         {
             total = 32768 * 60;
-            step = std::min<uint32_t>(total / bpm, 65535);
+            step = std::min<uint32_t>(total / bpm / subSteps[noteKind], 65535);
             amount = total / step;
             cumulative = 0;
         }
