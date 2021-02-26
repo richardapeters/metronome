@@ -1,4 +1,6 @@
+#include "infra/event/EventDispatcher.hpp"
 #include "metronome/application/BeatController.hpp"
+#include "services/tracer/GlobalTracer.hpp"
 
 namespace application
 {
@@ -23,6 +25,7 @@ namespace application
         MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         BeatController::GetObserver().BeatOn();
         MetronomePainterSubject::GetObserver().ManualPaint();
+        swap = true;
         BeatTimerObserver::Subject().Start(bpm, beatsPerMeasure, noteKind);
     }
 
@@ -64,26 +67,39 @@ namespace application
 
     void BeatControllerImpl::Beat()
     {
-        MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
-        PrepareNextBeat();
+        if (swap.exchange(false))
+            MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
+        else
+            infra::EventDispatcher::Instance().Schedule([this]()
+            {
+                expectedPaintDuration += std::chrono::milliseconds(5);
+                services::GlobalTracer().Trace() << "Increasing duration to " << std::chrono::duration_cast<std::chrono::milliseconds>(expectedPaintDuration).count() << "ms";
+                MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
+            });
 
-        beatOff.Start(std::chrono::milliseconds(30), [this]() { BeatController::GetObserver().BeatOff(); });
+        infra::EventDispatcher::Instance().Schedule([this]()
+        {
+            PrepareNextBeat();
+
+            beatOff.Start(std::chrono::milliseconds(30), [this]() { BeatController::GetObserver().BeatOff(); });
+        });
     }
 
     void BeatControllerImpl::PrepareNextBeat()
     {
-        holdPaint.Start(std::chrono::microseconds(60000000 / bpm) - std::chrono::milliseconds(160), [this]()
+        holdPaint.Start(std::chrono::microseconds(60000000 / bpm) - 2 * expectedPaintDuration, [this]()
         {
             MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         });
 
-        prepareBeat.Start(std::chrono::microseconds(60000000 / bpm) - std::chrono::milliseconds(80), [this]()
+        prepareBeat.Start(std::chrono::microseconds(60000000 / bpm) - expectedPaintDuration, [this]()
         {
             BeatController::GetObserver().BeatOn();
             auto start = infra::Now();
             MetronomePainterSubject::GetObserver().ManualPaint();
             auto duration = infra::Now() - start;
-            //services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+            swap = true;
+            services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
         });
     }
 }

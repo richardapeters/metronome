@@ -4,6 +4,7 @@
 #include "infra/util/Observer.hpp"
 #include "infra/util/Optional.hpp"
 #include "infra/timer/Timer.hpp"
+#include <atomic>
 
 namespace application
 {
@@ -99,6 +100,9 @@ namespace application
         bool running = false;
         infra::Optional<uint8_t> beatsPerMeasure;
         uint8_t noteKind = 0;
+
+        infra::Duration expectedPaintDuration = std::chrono::milliseconds(50);
+        std::atomic<bool> swap{ false };
     };
 }
 
