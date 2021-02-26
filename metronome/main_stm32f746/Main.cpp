@@ -1,3 +1,4 @@
+#include "generated/stm32fxxx/PeripheralTable.hpp"
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
@@ -14,6 +15,7 @@
 #include "preview/stm32fxxx/BitmapPainterStm.hpp"
 #include "services/tracer/GlobalTracer.hpp"
 #include "services/util/DebugLed.hpp"
+#include "stm32f7xx_hal_sd.h"
 
 uint32_t GetHseValue()
 {
@@ -82,6 +84,126 @@ extern uint8_t click_end;
 infra::MemoryRange<const int16_t> clickAccent(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_start) + std::distance(reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_end)) / 4 })));
 infra::MemoryRange<const int16_t> click(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
 
+class SdStm
+    : public hal::Flash64
+{
+public:
+    SdStm(uint8_t oneBasedIndex, hal::GpioPinStm& clock, hal::GpioPinStm& cmd, hal::GpioPinStm& d0, hal::GpioPinStm& d1, hal::GpioPinStm& d2, hal::GpioPinStm& d3, const infra::Function<void()>& onInitialized);
+    ~SdStm();
+
+    // Implementation of Flash64
+    virtual uint64_t NumberOfSectors() const override;
+    virtual uint32_t SizeOfSector(uint64_t sectorIndex) const override;
+    virtual uint64_t SectorOfAddress(uint64_t address) const override;
+    virtual uint64_t AddressOfSector(uint64_t sectorIndex) const override;
+    virtual void WriteBuffer(infra::ConstByteRange buffer, uint64_t address, infra::Function<void()> onDone) override;
+    virtual void ReadBuffer(infra::ByteRange buffer, uint64_t address, infra::Function<void()> onDone) override;
+    virtual void EraseSectors(uint64_t beginIndex, uint64_t endIndex, infra::Function<void()> onDone) override;
+
+private:
+    uint8_t instance;
+    hal::PeripheralPinStm clock;
+    hal::PeripheralPinStm cmd;
+    hal::PeripheralPinStm d0;
+    hal::PeripheralPinStm d1;
+    hal::PeripheralPinStm d2;
+    hal::PeripheralPinStm d3;
+
+    SD_HandleTypeDef handle{};
+    HAL_SD_CardInfoTypedef cardInfo{};
+
+    uint64_t numberOfSectors = 0;
+    uint32_t sizeOfEachSector = 0;
+};
+
+SdStm::SdStm(uint8_t oneBasedIndex, hal::GpioPinStm& clock, hal::GpioPinStm& cmd, hal::GpioPinStm& d0, hal::GpioPinStm& d1, hal::GpioPinStm& d2, hal::GpioPinStm& d3, const infra::Function<void()>& onInitialized)
+    : instance(oneBasedIndex - 1)
+    , clock(clock, hal::PinConfigTypeStm::sdClk, oneBasedIndex)
+    , cmd(cmd, hal::PinConfigTypeStm::sdCmd, oneBasedIndex)
+    , d0(d0, hal::PinConfigTypeStm::sdD0, oneBasedIndex)
+    , d1(d1, hal::PinConfigTypeStm::sdD1, oneBasedIndex)
+    , d2(d2, hal::PinConfigTypeStm::sdD2, oneBasedIndex)
+    , d3(d3, hal::PinConfigTypeStm::sdD3, oneBasedIndex)
+{
+    hal::EnableClockSd(instance);
+
+    handle.Instance = SDMMC1;
+
+    handle.Init.ClockEdge           = SDMMC_CLOCK_EDGE_RISING;
+    handle.Init.ClockBypass         = SDMMC_CLOCK_BYPASS_DISABLE;
+    handle.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+    handle.Init.BusWide             = SDMMC_BUS_WIDE_1B;
+    handle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
+    handle.Init.ClockDiv            = SDMMC_TRANSFER_CLK_DIV;
+
+    HAL_SD_Init(&handle, &cardInfo);
+    HAL_SD_WideBusOperation_Config(&handle, SDMMC_BUS_WIDE_4B);
+
+    numberOfSectors = cardInfo.CardCapacity / cardInfo.CardBlockSize;
+    sizeOfEachSector = cardInfo.CardBlockSize;
+
+    infra::EventDispatcher::Instance().Schedule(onInitialized);
+}
+
+uint64_t SdStm::NumberOfSectors() const
+{
+    return numberOfSectors;
+}
+
+uint32_t SdStm::SizeOfSector(uint64_t sectorIndex) const
+{
+    return sizeOfEachSector;
+}
+
+uint64_t SdStm::SectorOfAddress(uint64_t address) const
+{
+    return address / sizeOfEachSector;
+}
+
+uint64_t SdStm::AddressOfSector(uint64_t sectorIndex) const
+{
+    return sectorIndex * sizeOfEachSector;
+}
+
+void SdStm::WriteBuffer(infra::ConstByteRange buffer, uint64_t address, infra::Function<void()> onDone)
+{
+    std::abort();
+}
+
+void SdStm::ReadBuffer(infra::ByteRange buffer, uint64_t address, infra::Function<void()> onDone)
+{
+    really_assert(sizeOfEachSector == 1024);
+
+    auto discard = address % sizeOfEachSector;
+    address -= discard;
+
+    while (!buffer.empty())
+    {
+        std::array<uint32_t, 1024 / 4> data;
+        auto result = HAL_SD_ReadBlocks(&handle, data.begin(), address, 512, 1);
+        really_assert(result == SD_OK);
+
+        auto byteData = infra::Head(infra::DiscardHead(infra::ReinterpretCastByteRange(infra::MakeRange(data)), discard), buffer.size());
+        infra::Copy(byteData, buffer);
+        buffer.pop_front(byteData.size());
+        address += discard + byteData.size();
+
+        discard = 0;
+    }
+
+    infra::EventDispatcher::Instance().Schedule(onDone);
+}
+
+void SdStm::EraseSectors(uint64_t beginIndex, uint64_t endIndex, infra::Function<void()> onDone)
+{
+    std::abort();
+}
+
+SdStm::~SdStm()
+{
+    hal::DisableClockSd(instance);
+}
+
 int main()
 {
     static hal::InterruptTable::WithStorage<128> interruptTable;
@@ -108,6 +230,23 @@ int main()
         static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
     });
+
+    // Detect SD card
+
+    hal::GpioPinStm sdClk(hal::Port::C, 12);
+    hal::GpioPinStm sdCmd(hal::Port::D, 2);
+    hal::GpioPinStm sdD0(hal::Port::C, 8);
+    hal::GpioPinStm sdD1(hal::Port::C, 9);
+    hal::GpioPinStm sdD2(hal::Port::C, 10);
+    hal::GpioPinStm sdD3(hal::Port::C, 11);
+    static SdStm sd(1, sdClk, sdCmd, sdD0, sdD1, sdD2, sdD3, []()
+	{
+    	static std::array<uint8_t, 512> data;
+    	sd.ReadBuffer(data, 0, []()
+		{
+    		__BKPT();
+	    });
+	});
 
     eventDispatcher.Run();
     __builtin_unreachable();
