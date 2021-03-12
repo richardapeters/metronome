@@ -52,12 +52,9 @@ namespace application
         if (currentBeat % subSteps[noteKind] == 0)
             GetObserver().Beat();
 
-        if (beatsPerMeasure != infra::none)
-        {
-            ++currentBeat;
-            if (currentBeat == *beatsPerMeasure * subSteps[noteKind])
-                currentBeat = 0;
-        }
+        ++currentBeat;
+        if (currentBeat == beatsPerMeasure.ValueOr(1) * subSteps[noteKind])
+            currentBeat = 0;
     }
 
     void MetronomeBeatTimerStm::SetNextReload()
