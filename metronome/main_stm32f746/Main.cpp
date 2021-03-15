@@ -2,6 +2,7 @@
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
+#include "infra/stream/ByteInputStream.hpp"
 #include "metronome/application/Metronome.hpp"
 #include "metronome/application/Wm8994.hpp"
 #include "metronome/main_stm32f746/Flash.hpp"
@@ -32,35 +33,76 @@ struct WavHeader
     std::array<char, 4> riff;
     uint32_t fileSize;
     std::array<char, 4> wave;
-    std::array<char, 4> fmt;
-    uint32_t formatLength;
+};
+
+struct WavHeaderChunk
+{
+    std::array<char, 4> subChunkId;
+    uint32_t subChunkLength;
+};
+
+struct WavHeaderChunkFormat
+{
     uint16_t formatType;
     uint16_t numberOfChannels;
     uint32_t samplesPerSecond;
     uint32_t bytesPerSecond;
     uint16_t bla;
     uint16_t bitsPerSample;
-    uint32_t dummy;
-    std::array<char, 4> data;
-    uint32_t dataLength;
 };
+
 
 bool StringArrayEqual(infra::MemoryRange<const char> array, infra::BoundedConstString string)
 {
     return infra::BoundedConstString(array.begin(), array.size()) == string;
 }
 
-infra::ConstByteRange ReadClick(const WavHeader header, infra::ConstByteRange data)
+infra::MemoryRange<const int16_t> FirstChannel(infra::MemoryRange<const int16_t> twoChannels)
 {
+    auto memory = new int16_t[twoChannels.size() / 2];
+    infra::MemoryRange<int16_t> result(memory, memory + twoChannels.size() / 2);
+
+    for (auto& r : result)
+    {
+        r = twoChannels.front();
+        twoChannels.pop_front(2);
+    }
+
+    return result;
+}
+
+infra::MemoryRange<const int16_t> ReadClick(infra::ConstByteRange data)
+{
+    infra::ByteInputStream stream(data);
+
+    auto header = stream.Extract<WavHeader>();
     really_assert(StringArrayEqual(header.riff, "RIFF"));
     really_assert(StringArrayEqual(header.wave, "WAVE"));
-    really_assert(StringArrayEqual(header.fmt, "fmt "));
-    really_assert(StringArrayEqual(header.data, "data"));
-    really_assert(header.formatType == 1);
-    really_assert(header.numberOfChannels == 1);
-    really_assert(header.bitsPerSample == 16);
 
-    return infra::Head(infra::DiscardHead(data, sizeof(header)), header.dataLength);
+    auto headerFormatChunk = stream.Extract<WavHeaderChunk>();
+    really_assert(StringArrayEqual(headerFormatChunk.subChunkId, "fmt "));
+
+    auto headerFormatChunkFormat = stream.Extract<WavHeaderChunkFormat>();
+    stream.Reader().ResetRange(infra::DiscardHead(stream.Reader().Remaining(), headerFormatChunk.subChunkLength - sizeof(WavHeaderChunkFormat)));
+    really_assert(headerFormatChunkFormat.formatType == 1);
+    really_assert(headerFormatChunkFormat.numberOfChannels == 1 || headerFormatChunkFormat.numberOfChannels == 2);
+    really_assert(headerFormatChunkFormat.bitsPerSample == 16);
+
+    while (!stream.Empty())
+    {
+        auto headerDataChunk = stream.Extract<WavHeaderChunk>();
+        if (StringArrayEqual(headerDataChunk.subChunkId, "data"))
+        {
+            if (headerFormatChunkFormat.numberOfChannels == 1)
+                return infra::ReinterpretCastMemoryRange<const int16_t>(infra::Head(stream.Reader().Remaining(), headerDataChunk.subChunkLength));
+            else
+                return FirstChannel(infra::ReinterpretCastMemoryRange<const int16_t>(infra::Head(stream.Reader().Remaining(), headerDataChunk.subChunkLength)));
+        }
+
+        stream.Reader().ResetRange(infra::DiscardHead(stream.Reader().Remaining(), headerDataChunk.subChunkLength));
+    }
+
+    std::abort();
 }
 
 infra::MemoryRange<const int16_t> CreateSoftClick(infra::MemoryRange<const int16_t> click)
@@ -80,9 +122,8 @@ extern uint8_t click_accent_end;
 extern WavHeader click_start;
 extern uint8_t click_end;
 
-//infra::MemoryRange<const int16_t> clickAccent(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_accent_start, { reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end })));
-infra::MemoryRange<const int16_t> clickAccent(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_start) + std::distance(reinterpret_cast<const uint8_t*>(&click_start), reinterpret_cast<const uint8_t*>(&click_end)) / 4 })));
-infra::MemoryRange<const int16_t> click(infra::ReinterpretCastMemoryRange<const int16_t>(ReadClick(click_start, { reinterpret_cast<const uint8_t*>(&click_start), &click_end })));
+infra::MemoryRange<const int16_t> clickAccent(ReadClick({ reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end }));
+infra::MemoryRange<const int16_t> click(ReadClick({ reinterpret_cast<const uint8_t*>(&click_start), &click_end }));
 
 class SdStm
     : public hal::Flash64
@@ -225,7 +266,7 @@ int main()
 
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
-        static application::MetronomeBeatTimerStm beatTimer(sai.controller, click, click, softClick);
+        static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
