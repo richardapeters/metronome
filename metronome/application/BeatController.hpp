@@ -90,19 +90,51 @@ namespace application
         virtual void Beat() override;
 
     private:
-        void PrepareNextBeat();
+        void EvaluateRunningRequested();
+        void RunningStopped();
 
     private:
-        infra::TimerSingleShot holdPaint;
-        infra::TimerSingleShot prepareBeat;
-        infra::TimerSingleShot beatOff;
+        class RunningState
+        {
+        public:
+            RunningState(BeatControllerImpl& controller);
+
+            void Stop();
+            void Beat();
+
+        private:
+            void PrepareNextBeat();
+            void BeatOn();
+            void SwapLayers();
+
+        private:
+            BeatControllerImpl& controller;
+
+            infra::TimerSingleShot holdPaint;
+            infra::TimerSingleShot prepareBeat;
+            infra::TimerSingleShot beatOff;
+
+            enum class State
+            {
+                idle,
+                stoppedPainting,
+                needSwap,
+                swapping
+            };
+
+            std::atomic<State> state{ State::needSwap };
+            bool stopRequested = false;
+        };
+
+    private:
         uint16_t bpm;
-        bool running = false;
         infra::Optional<uint8_t> beatsPerMeasure;
         uint8_t noteKind = 0;
 
-        infra::Duration expectedPaintDuration = std::chrono::milliseconds(50);
-        std::atomic<bool> swap{ false };
+        infra::Duration expectedPaintDuration = std::chrono::milliseconds(70);
+
+        infra::Optional<RunningState> runningState;
+        bool runningRequested = false;
     };
 }
 

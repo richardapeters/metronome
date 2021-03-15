@@ -17,28 +17,21 @@ namespace application
 
     void BeatControllerImpl::Start()
     {
-        if (Running())
-            Stop();
+        Stop();
 
-        running = true;
-        PrepareNextBeat();
-        MetronomePainterSubject::GetObserver().StopAutomaticPainting();
-        BeatController::GetObserver().BeatOn();
-        MetronomePainterSubject::GetObserver().ManualPaint();
-        swap = true;
-        BeatTimerObserver::Subject().Start(bpm, beatsPerMeasure, noteKind);
+        runningRequested = true;
+        EvaluateRunningRequested();
     }
 
     void BeatControllerImpl::Stop()
     {
-        running = false;
-        BeatTimerObserver::Subject().Stop();
-        prepareBeat.Cancel();
+        if (Running())
+            runningState->Stop();
     }
 
     bool BeatControllerImpl::Running() const
     {
-        return running;
+        return runningState != infra::none;
     }
 
     void BeatControllerImpl::SelectedBeatsPerMeasure(uint8_t beatsPerMeasure)
@@ -67,39 +60,111 @@ namespace application
 
     void BeatControllerImpl::Beat()
     {
-        if (swap.exchange(false))
-            MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
-        else
-            infra::EventDispatcher::Instance().Schedule([this]()
-            {
-                expectedPaintDuration += std::chrono::milliseconds(5);
-                services::GlobalTracer().Trace() << "Increasing duration to " << std::chrono::duration_cast<std::chrono::milliseconds>(expectedPaintDuration).count() << "ms";
-                MetronomePainterSubject::GetObserver().SwapLayers([this]() { MetronomePainterSubject::GetObserver().StartAutomaticPainting(); });
-            });
+        if (Running())
+            runningState->Beat();
+    }
 
-        infra::EventDispatcher::Instance().Schedule([this]()
+    void BeatControllerImpl::EvaluateRunningRequested()
+    {
+        if (runningRequested && !runningState)
         {
-            PrepareNextBeat();
+            runningRequested = false;
+            runningState.Emplace(*this);
+        }
+    }
 
-            beatOff.Start(std::chrono::milliseconds(30), [this]() { BeatController::GetObserver().BeatOff(); });
+    void BeatControllerImpl::RunningStopped()
+    {
+        runningState = infra::none;
+        EvaluateRunningRequested();
+    }
+
+    BeatControllerImpl::RunningState::RunningState(BeatControllerImpl& controller)
+        : controller(controller)
+    {
+        PrepareNextBeat();
+        controller.MetronomePainterSubject::GetObserver().StopAutomaticPainting();
+        BeatOn();
+        controller.BeatTimerObserver::Subject().Start(controller.bpm, controller.beatsPerMeasure, controller.noteKind);
+    }
+
+    void BeatControllerImpl::RunningState::Stop()
+    {
+        if (stopRequested)
+            return;
+
+        holdPaint.Cancel();
+        prepareBeat.Cancel();
+        beatOff.Cancel();
+        controller.BeatTimerObserver::Subject().Stop();
+        controller.BeatController::GetObserver().BeatOff();
+
+        stopRequested = true;
+
+        switch (state)
+        {
+            case State::idle:
+                controller.RunningStopped();
+                break;
+            case State::stoppedPainting:
+                controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
+                controller.RunningStopped();
+                break;
+            case State::needSwap:
+                controller.MetronomePainterSubject::GetObserver().SwapLayers([this]()
+                {
+                    controller.BeatController::GetObserver().BeatOff();
+                    controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
+                    controller.RunningStopped();
+                });
+                break;
+            case State::swapping:
+                break;
+            default:
+                std::abort();
+        }
+    }
+
+    void BeatControllerImpl::RunningState::Beat()
+    {
+        if (state.exchange(State::swapping) == State::needSwap)
+            SwapLayers();
+    }
+
+    void BeatControllerImpl::RunningState::PrepareNextBeat()
+    {
+        holdPaint.Start(std::chrono::microseconds(60000000 / controller.bpm) - 2 * controller.expectedPaintDuration, [this]()
+        {
+            State expected = State::idle;
+            if (state.compare_exchange_strong(expected, State::stoppedPainting))
+                controller.MetronomePainterSubject::GetObserver().StopAutomaticPainting();
+        });
+
+        prepareBeat.Start(std::chrono::microseconds(60000000 / controller.bpm) - controller.expectedPaintDuration, [this]()
+        {
+            State expected = State::stoppedPainting;
+            if (state.compare_exchange_strong(expected, State::needSwap));
+                BeatOn();
         });
     }
 
-    void BeatControllerImpl::PrepareNextBeat()
+    void BeatControllerImpl::RunningState::BeatOn()
     {
-        holdPaint.Start(std::chrono::microseconds(60000000 / bpm) - 2 * expectedPaintDuration, [this]()
-        {
-            MetronomePainterSubject::GetObserver().StopAutomaticPainting();
-        });
+        controller.BeatController::GetObserver().BeatOn();
+        controller.MetronomePainterSubject::GetObserver().ManualPaint();
+    }
 
-        prepareBeat.Start(std::chrono::microseconds(60000000 / bpm) - expectedPaintDuration, [this]()
+    void BeatControllerImpl::RunningState::SwapLayers()
+    {
+        controller.MetronomePainterSubject::GetObserver().SwapLayers([this]()
         {
-            BeatController::GetObserver().BeatOn();
-            auto start = infra::Now();
-            MetronomePainterSubject::GetObserver().ManualPaint();
-            auto duration = infra::Now() - start;
-            swap = true;
-            services::GlobalTracer().Trace() << "Paint duration: " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+            state = State::idle;
+            controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
+
+            PrepareNextBeat();
+            beatOff.Start(std::chrono::milliseconds(30), [this]() { controller.BeatController::GetObserver().BeatOff(); });
+            if (stopRequested)
+                controller.RunningStopped();
         });
     }
 }
