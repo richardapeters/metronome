@@ -49,8 +49,8 @@ namespace application
             { 0x610, 0x00C0 },      // Unmute DAC1 ( Left)
             { 0x611, 0x00C0 },      // Unmute DAC1 (Right)
             { 0x420, 0x0000 },      // Unmute the AIF1 Timeslot 0 DAC path
-            { 0x1c, 0x18 | 0x140 }, // Left Headphone Volume
-            { 0x1d, 0x18 | 0x140 }, // Right Headphone Volume
+            { 0x1c, 0x3f | 0x140 }, // Left Headphone Volume
+            { 0x1d, 0x3f | 0x140 }, // Right Headphone Volume
         } };
     }
 
