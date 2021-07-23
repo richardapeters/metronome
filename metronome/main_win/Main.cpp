@@ -4,73 +4,10 @@
 #include "infra/util/PostAssign.hpp"
 #include "metronome/application/Metronome.hpp"
 #include "metronome/application/ViewDateEntry.hpp"
-#include "preview/interfaces/ViewPainterDirectDisplay.hpp"
 #include "preview/sdl/DirectDisplaySdl.hpp"
 #include "preview/sdl/LowPowerStrategySdl.hpp"
 #include "preview/sdl/SdlTouchInteractor.hpp"
 #include <Windows.h>
-
-namespace application
-{
-    class MetronomeRefresher
-        : public services::View
-    {
-    public:
-        MetronomeRefresher(services::ViewPainter& viewPainter, services::View& view);
-
-        virtual void Paint(hal::Canvas& canvas, infra::Region boundingRegion) override;
-
-    protected:
-        virtual void Dirty(infra::Region region) override;
-
-    private:
-        void Paint();
-        void PaintDone();
-
-    private:
-        services::ViewPainter& viewPainter;
-        services::View& view;
-        infra::Region dirtyRegion;
-
-        bool scheduled = false;
-    };
-
-    MetronomeRefresher::MetronomeRefresher(services::ViewPainter& viewPainter, services::View& view)
-        : viewPainter(viewPainter)
-        , view(view)
-    {
-        view.SetParent(*this);
-        Dirty(view.ViewRegion());
-    }
-
-    void MetronomeRefresher::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
-    {
-        std::abort();
-    }
-
-    void MetronomeRefresher::Dirty(infra::Region region)
-    {
-        dirtyRegion = dirtyRegion | region;
-
-        if (!scheduled)
-        {
-            scheduled = true;
-            infra::EventDispatcher::Instance().Schedule([this]() { Paint(); });
-        }
-    }
-
-    void MetronomeRefresher::Paint()
-    {
-        viewPainter.Paint(view, infra::PostAssign(dirtyRegion, infra::Region()), [this]() { PaintDone(); });
-    }
-
-    void MetronomeRefresher::PaintDone()
-    {
-        scheduled = false;
-        if (!dirtyRegion.Empty())
-            Dirty(dirtyRegion);
-    }
-}
 
 class MyTimerService
     : public services::SettableTimerService
@@ -150,41 +87,49 @@ void BeatTimerStub::Stop()
     timer.Cancel();
 }
 
-class DisplayAdapter
+class DoubleBufferDisplayAdaptedFromDirectDisplay
     : public hal::DoubleBufferDisplay
 {
 public:
-    DisplayAdapter(hal::DirectDisplay& display);
+    template<int32_t width, int32_t height, infra::PixelFormat pixelFormat>
+    using WithStorage = infra::WithStorage<infra::WithStorage<DoubleBufferDisplayAdaptedFromDirectDisplay,
+        infra::Bitmap::WithStorage<width, height, pixelFormat>>,
+        infra::Bitmap::WithStorage<width, height, pixelFormat>>;
+
+    DoubleBufferDisplayAdaptedFromDirectDisplay(infra::Bitmap& drawingBitmap, infra::Bitmap& viewingBitmap, hal::DirectDisplay& display);
 
     virtual void SwapLayers(const infra::Function<void()>& onDone) override;
     virtual infra::Bitmap& DrawingBitmap() override;
     virtual const infra::Bitmap& ViewingBitmap() const override;
 
 private:
+    infra::Bitmap* drawingBitmap;
+    infra::Bitmap* viewingBitmap;
     hal::DirectDisplay& display;
-    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> drawingBitmap;
-    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> viewingBitmap;
 };
 
-DisplayAdapter::DisplayAdapter(hal::DirectDisplay& display)
-    : display(display)
+DoubleBufferDisplayAdaptedFromDirectDisplay::DoubleBufferDisplayAdaptedFromDirectDisplay(infra::Bitmap& drawingBitmap, infra::Bitmap& viewingBitmap, hal::DirectDisplay& display)
+    : drawingBitmap(&drawingBitmap)
+    , viewingBitmap(&viewingBitmap)
+    , display(display)
 {}
 
-void DisplayAdapter::SwapLayers(const infra::Function<void()>& onDone)
+void DoubleBufferDisplayAdaptedFromDirectDisplay::SwapLayers(const infra::Function<void()>& onDone)
 {
     std::swap(drawingBitmap, viewingBitmap);
-    display.DrawBitmap(infra::Point(), viewingBitmap, infra::Region(infra::Point(), display.Size()));
+    display.DrawBitmap(infra::Point(), *viewingBitmap, infra::Region(infra::Point(), display.Size()));
+    display.PaintingComplete();
     onDone();
 }
 
-infra::Bitmap& DisplayAdapter::DrawingBitmap()
+infra::Bitmap& DoubleBufferDisplayAdaptedFromDirectDisplay::DrawingBitmap()
 {
-    return drawingBitmap;
+    return *drawingBitmap;
 }
 
-const infra::Bitmap& DisplayAdapter::ViewingBitmap() const
+const infra::Bitmap& DoubleBufferDisplayAdaptedFromDirectDisplay::ViewingBitmap() const
 {
-    return viewingBitmap;
+    return *viewingBitmap;
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -197,13 +142,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     hal::DirectDisplaySdl display(infra::Vector(480, 272));
 
     BeatTimerStub beatTimer;
-    DisplayAdapter displayAdapter(display);
+    DoubleBufferDisplayAdaptedFromDirectDisplay::WithStorage<480, 272, infra::PixelFormat::rgb565> displayAdapter(display);
     hal::BitmapPainterCanonical bitmapPainter;
     main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter);
     services::SdlTouchInteractor touchInteractor(lowPowerStrategy, metronome.touch);
-
-    services::ViewPainterDirectDisplay viewPainter(display);
-    application::MetronomeRefresher refresher(viewPainter, metronome.touch.GetView());
 
     eventDispatcher.Run();
 
