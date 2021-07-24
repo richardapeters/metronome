@@ -1,6 +1,8 @@
 ccola_component(main_win win: executable other: noncompile)
 
     ccola_sources(
+        DoubleBufferDisplayAdaptedFromDirectDisplay.cpp
+        DoubleBufferDisplayAdaptedFromDirectDisplay.hpp
         Main.cpp
     )
 
