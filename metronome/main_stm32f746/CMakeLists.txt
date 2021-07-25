@@ -13,6 +13,8 @@ ccola_component(main_stm32f746 stm32f746: executable other: noncompile)
         PeripheralI2c.hpp
         Sai.cpp
         Sai.hpp
+        SdStm.cpp
+        SdStm.hpp
         Touch.cpp
         Touch.hpp
         Tracer.cpp
