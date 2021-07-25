@@ -48,6 +48,7 @@ namespace application
             {
                 Touched(infra::Point(((static_cast<uint8_t>(xy) & 0xf) << 8) + static_cast<uint8_t>(xy >> 8), (static_cast<uint8_t>(xy >> 16) << 8) + static_cast<uint8_t>(xy >> 24)));
                 idle = true;
+                Measure();
             });
         });
     }
