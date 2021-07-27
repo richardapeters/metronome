@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 include("${CCOLA_DIR}/ccola.inc")
 
+set(CMAKE_CXX_STANDARD 17)
+
 ccola_programmer(
     cubeide-j-link
 )
@@ -13,14 +15,19 @@ ccola_programmer(
 ccola_project(Train)
 
     ccola_subdirectories(
+        EmbeddedInfraLib/external/args
         EmbeddedInfraLib/external/googletest
         EmbeddedInfraLib/external/crypto
         EmbeddedInfraLib/infra
         EmbeddedInfraLib/hal
         EmbeddedInfraLib/services
+        EmbeddedInfraLib/external/protobuf-3.3.0
+        EmbeddedInfraLib/external/protoc-3.3.0
+        EmbeddedInfraLib/protobuf
         HalSt/hal_st
         Preview/external/SDL2-2.0.5
         Preview/preview
+	IoExpander/io_expander
         local_hal
         metronome
     )
