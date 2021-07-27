@@ -12,5 +12,5 @@
 	branch = develop
 [submodule "IoExpander"]
 	path = IoExpander
-	url = D:\\310116308\\OneDrive - Philips\\IoExpander.git
+	url = ../IoExpander.git
 	branch = master
