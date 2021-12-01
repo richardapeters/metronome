@@ -25,6 +25,8 @@ ccola_component(application static_library)
         ViewNoteKind.hpp
         ViewPainterMetronome.cpp
         ViewPainterMetronome.hpp
+        ViewSprocket.cpp
+        ViewSprocket.hpp
         ViewStart.cpp
         ViewStart.hpp
         ViewTapMeasurement.cpp
