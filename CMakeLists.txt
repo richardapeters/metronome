@@ -1,18 +1,16 @@
 cmake_minimum_required(VERSION 3.2.3)
 
 project(Metronome)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 include("${CCOLA_DIR}/ccola.inc")
-
-set(CMAKE_CXX_STANDARD 17)
 
 ccola_programmer(
     cubeide-j-link
 )
 
-ccola_project(Train)
+ccola_project(Metronome)
 
     ccola_subdirectories(
         EmbeddedInfraLib/external/args
