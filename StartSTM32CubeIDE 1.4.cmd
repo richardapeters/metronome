@@ -1,4 +1,4 @@
 set path=%path:"=%
-call "%VS140COMNTOOLS%vsvars32.bat"
+call "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
 start "" "C:\ST\STM32CubeIDE_1.4.0\STM32CubeIDE\stm32cubeide.exe"
 
