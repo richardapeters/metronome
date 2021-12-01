@@ -10,11 +10,22 @@ namespace application
         const auto pi = std::acos(-1);
     }
 
-    const std::array<uint16_t, 8> ViewBpm::sprocketValues = { { 80, 90, 100, 120, 140, 160, 60, 70 } };
+    const std::array<uint16_t, 8> ViewBpm::selectValues = { { 80, 90, 100, 120, 140, 160, 60, 70 } };
 
     ViewBpm::ViewBpm(BeatController& controller)
         : BeatControllerObserver(controller)
-    {}
+        , valueSelect(selectValues, [this](uint16_t value) { Select(value); }, 0)
+        , valueFastUp(fastUpValues, [this](uint16_t value) { Select(value); }, 0)
+        , valueFastDown(fastDownValues, [this](uint16_t value) { Select(value); }, 0)
+        , valueSlowUp(slowUpValues, [this](uint16_t value) { Select(value); }, 1)
+        , valueSlowDown(slowDownValues, [this](uint16_t value) { Select(value); }, 3)
+    {
+        valueSelect.SetParent(*this);
+        valueFastUp.SetParent(*this);
+        valueFastDown.SetParent(*this);
+        valueSlowUp.SetParent(*this);
+        valueSlowDown.SetParent(*this);
+    }
 
     void ViewBpm::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
     {
@@ -27,17 +38,28 @@ namespace application
         canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 1, ViewRegion().Size().deltaX / 3 + 1, infra::Colour::red, boundingRegion);
 
         auto& font = infra::freeSans24pt7b;
-        canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpm) / 2, font.cursorToTop / 2), bpm, font, infra::Colour::blue, boundingRegion);
+        canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpmString) / 2, font.cursorToTop / 2), bpmString, font, infra::Colour::blue, boundingRegion);
 
-        if (mode == TouchMode::wheel)
-            for (int sprocket = 0; sprocket != 8; ++sprocket)
-                DrawSprocket(canvas, boundingRegion, sprocket);
+        if (currentSprocket != nullptr)
+            currentSprocket->Paint(canvas, boundingRegion);
+    }
+
+    void ViewBpm::ViewRegionChanged()
+    {
+        valueSelect.SetViewRegion(ViewRegion());
+        valueFastUp.SetViewRegion(ViewRegion());
+        valueFastDown.SetViewRegion(ViewRegion());
+        valueSlowUp.SetViewRegion(ViewRegion());
+        valueSlowDown.SetViewRegion(ViewRegion());
     }
 
     void ViewBpm::StartTouch(infra::Point point)
     {
         if (infra::Distance(ViewRegion().Centre(), point) < static_cast<uint16_t>(ViewRegion().Size().deltaX / 6))
-            mode = TouchMode::wheel;
+        {
+            currentSprocket = &valueSelect;
+            valueSelect.StartTouch(point);
+        }
         else
         {
             int16_t distanceToTop = point.y;
@@ -46,11 +68,62 @@ namespace application
             int16_t distanceToRight = ViewRegion().Size().deltaX - point.x;
 
             if (std::min(distanceToLeft, distanceToRight) < std::min(distanceToTop, distanceToBottom))
-                mode = TouchMode::bpmMulti;
-            else
-                mode = TouchMode::bpmSingle;
+            {
+                if (distanceToLeft < distanceToRight)
+                {
+                    currentSprocket = &valueFastUp;
 
-            stepsReported = 0;
+                    fastUpValues[0] = (bpm + 20) / 10 * 10;
+                    fastUpValues[3] = (bpm + 10) / 10 * 10;
+                    fastUpValues[1] = (bpm + 5) / 5 * 5;
+
+                    for (int i = 0; i != fastUpValues.size(); ++i)
+                        if (!BeatControllerObserver::Subject().BpmIsValid(fastUpValues[i]))
+                            fastUpValues[i] = 0;
+                }
+                else
+                {
+                    currentSprocket = &valueFastDown;
+
+                    fastDownValues[2] = (bpm - 20 + 9) / 10 * 10;
+                    fastDownValues[3] = (bpm - 10 + 9) / 10 * 10;
+                    fastDownValues[1] = (bpm - 5 + 4) / 5 * 5;
+
+                    for (int i = 0; i != fastDownValues.size(); ++i)
+                        if (!BeatControllerObserver::Subject().BpmIsValid(fastDownValues[i]))
+                            fastDownValues[i] = 0;
+                }
+            }
+            else
+            {
+                if (distanceToTop < distanceToBottom)
+                {
+                    currentSprocket = &valueSlowDown;
+
+                    slowDownValues[0] = 0;
+                    for (int i = 1; i != slowDownValues.size(); ++i)
+                    {
+                        slowDownValues[i] = bpm - i;
+                        if (!BeatControllerObserver::Subject().BpmIsValid(slowDownValues[i]))
+                            slowDownValues[i] = 0;
+                    }
+                }
+                else
+                {
+                    currentSprocket = &valueSlowUp;
+
+                    slowUpValues[0] = 0;
+                    for (int i = 1; i != slowUpValues.size(); ++i)
+                    {
+                        slowUpValues[i] = bpm + i;
+                        if (!BeatControllerObserver::Subject().BpmIsValid(slowUpValues[i]))
+                            slowUpValues[i] = 0;
+                    }
+                }
+            }
+
+            if (currentSprocket != nullptr)
+                currentSprocket->StartTouch(point);
         }
 
         startTouch = point;
@@ -65,55 +138,8 @@ namespace application
 
     void ViewBpm::DragTo(infra::Point point)
     {
-        switch (mode)
-        {
-            case TouchMode::wheel:
-            {
-                if (infra::Distance(point, *startTouch) > static_cast<uint16_t>(ViewRegion().Size().deltaY / 6))
-                {
-                    auto startSelectedSprocket = selectedSprocket;
-                    selectedSprocket = 0;
-                    auto selectedSprocketDistance = infra::Distance(point, SprocketCentre(*selectedSprocket));
-                    for (int sprocket = 1; sprocket != 8; ++sprocket)
-                        if (infra::Distance(point, SprocketCentre(sprocket)) < selectedSprocketDistance)
-                        {
-                            selectedSprocket = sprocket;
-                            selectedSprocketDistance = infra::Distance(point, SprocketCentre(*selectedSprocket));
-                        }
-
-                    if (selectedSprocket != startSelectedSprocket)
-                        Dirty(ViewRegion());
-                }
-                else if (selectedSprocket != infra::none)
-                {
-                    selectedSprocket = infra::none;
-                    Dirty(ViewRegion());
-                }
-                break;
-            }
-            case TouchMode::bpmMulti:
-            {
-                auto steps = (point.x - startTouch->x) / (ViewRegion().Size().deltaX / 4) - stepsReported;
-                if (steps != 0)
-                {
-                    stepsReported += steps;
-                    NotifyObservers([steps](BpmSelectionObserver& observer) { observer.MultiStep(steps); });
-                    Dirty(ViewRegion());
-                }
-                break;
-            }
-            case TouchMode::bpmSingle:
-            {
-                auto steps = (startTouch->y - point.y) / (ViewRegion().Size().deltaY / 20) - stepsReported;
-                if (steps != 0)
-                {
-                    stepsReported += steps;
-                    NotifyObservers([steps](BpmSelectionObserver& observer) { observer.SingleStep(steps); });
-                    Dirty(ViewRegion());
-                }
-                break;
-            }
-        }
+        if (currentSprocket != nullptr)
+            currentSprocket->DragTo(point);
     }
 
     void ViewBpm::DragOut()
@@ -123,10 +149,10 @@ namespace application
 
     void ViewBpm::StopTouch()
     {
-        if (mode == TouchMode::wheel && selectedSprocket != infra::none)
-            NotifyObservers([this](BpmSelectionObserver& observer) { observer.BpmSelected(sprocketValues[*selectedSprocket]); });
+        if (currentSprocket != nullptr)
+            currentSprocket->StopTouch();
+        currentSprocket = nullptr;
 
-        mode = TouchMode::idle;
         startTouch = infra::none;
 
         Dirty(ViewRegion());
@@ -142,9 +168,10 @@ namespace application
 
     void ViewBpm::SetBpm(uint16_t newBpm)
     {
-        bpm.clear();
-        infra::StringOutputStream stream(bpm);
+        bpmString.clear();
+        infra::StringOutputStream stream(bpmString);
         stream << newBpm;
+        bpm = newBpm;
 
         Dirty(ViewRegion());
     }
@@ -161,21 +188,8 @@ namespace application
         Dirty(ViewRegion());
     }
 
-    void ViewBpm::DrawSprocket(hal::Canvas& canvas, infra::Region boundingRegion, int sprocket) const
+    void ViewBpm::Select(uint16_t value)
     {
-        infra::StringOutputStream::WithStorage<4> value;
-        value << sprocketValues[sprocket];
-
-        auto point = SprocketCentre(sprocket);
-        auto& font = infra::freeSans9pt7b;
-        canvas.DrawFilledCircle(point, ViewRegion().Size().deltaX / 16, selectedSprocket == sprocket ? infra::Colour::red : infra::Colour::blue, boundingRegion);
-        canvas.DrawString(point + infra::Vector(-font.Width(value.Storage()) / 2, font.cursorToTop / 2), value.Storage(), font, infra::Colour::white, boundingRegion);
-    }
-
-    infra::Point ViewBpm::SprocketCentre(int sprocket) const
-    {
-        auto offsetFromCentre = ViewRegion().Size().deltaX / 3;
-        return ViewRegion().Centre()
-            + infra::Vector(static_cast<int16_t>(std::cos(2 * pi * sprocket / 8) * offsetFromCentre), static_cast<int16_t>(std::sin(2 * pi * sprocket / 8) * offsetFromCentre));
+        NotifyObservers([value](BpmSelectionObserver& observer) { observer.BpmSelected(value); });
     }
 }

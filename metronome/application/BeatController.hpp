@@ -62,6 +62,8 @@ namespace application
     {
     public:
         virtual void SetBpm(uint16_t newBpm) = 0;
+        virtual uint16_t MakeBpmValid(uint16_t bpm) const = 0;
+        virtual bool BpmIsValid(uint16_t bpm) const = 0;
         virtual void Start() = 0;
         virtual void Stop() = 0;
         virtual bool Running() const = 0;
@@ -80,6 +82,8 @@ namespace application
         BeatControllerImpl(MetronomeBeatTimer& beatTimer);
 
         virtual void SetBpm(uint16_t newBpm) override;
+        virtual uint16_t MakeBpmValid(uint16_t bpm) const override;
+        virtual bool BpmIsValid(uint16_t bpm) const override;
         virtual void Start() override;
         virtual void Stop() override;
         virtual bool Running() const override;

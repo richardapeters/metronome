@@ -33,7 +33,7 @@ namespace application
 
     void BpmSelectionInteractor::Update()
     {
-        bpm = std::min(300, std::max(40, bpm + 0));
+        bpm = beatController.MakeBpmValid(bpm);
 
         Subject().SetBpm(bpm);
         beatController.SetBpm(bpm);

@@ -4,6 +4,7 @@
 #include "infra/util/Observer.hpp"
 #include "infra/timer/Timer.hpp"
 #include "metronome/application/BeatController.hpp"
+#include "metronome/application/ViewSprocket.hpp"
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
 
@@ -40,6 +41,7 @@ namespace application
 
         // Implementation of View
         virtual void Paint(hal::Canvas& canvas, infra::Region boundingRegion) override;
+        virtual void ViewRegionChanged();
 
         // Implementation of TouchRecipient
         virtual void StartTouch(infra::Point point) override;
@@ -58,27 +60,29 @@ namespace application
         virtual void BeatOff() override;
 
     private:
-        void DrawSprocket(hal::Canvas& canvas, infra::Region boundingRegion, int sprocket) const;
-        infra::Point SprocketCentre(int i) const;
+        void Select(uint16_t value);
 
     private:
-        infra::BoundedString::WithStorage<4> bpm;
+        infra::BoundedString::WithStorage<4> bpmString;
+        uint16_t bpm;
         infra::Colour backgroundColour = infra::Colour::white;
 
-        enum class TouchMode
-            : uint8_t
-        {
-            idle,
-            wheel,
-            bpmSingle,
-            bpmMulti
-        } mode;
-
         infra::Optional<infra::Point> startTouch;
-        infra::Optional<int> selectedSprocket;
         int stepsReported;
 
-        static const std::array<uint16_t, 8> sprocketValues;
+        ViewSprocket valueSelect;
+        ViewSprocket valueFastUp;
+        ViewSprocket valueFastDown;
+        ViewSprocket valueSlowUp;
+        ViewSprocket valueSlowDown;
+
+        ViewSprocket* currentSprocket = nullptr;
+
+        static const std::array<uint16_t, 8> selectValues;
+        std::array<uint16_t, 4> fastUpValues{};
+        std::array<uint16_t, 4> fastDownValues{};
+        std::array<uint16_t, 11> slowUpValues{};
+        std::array<uint16_t, 11> slowDownValues{};
     };
 }
 

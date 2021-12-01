@@ -15,6 +15,16 @@ namespace application
             Start();
     }
 
+    uint16_t BeatControllerImpl::MakeBpmValid(uint16_t bpm) const
+    {
+        return std::min(300, std::max(40, bpm + 0));
+    }
+
+    bool BeatControllerImpl::BpmIsValid(uint16_t bpm) const
+    {
+        return MakeBpmValid(bpm) == bpm;
+    }
+
     void BeatControllerImpl::Start()
     {
         Stop();
