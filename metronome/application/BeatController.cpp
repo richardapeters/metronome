@@ -143,7 +143,7 @@ namespace application
         prepareBeat.Start(std::chrono::microseconds(60000000 / controller.bpm) - controller.expectedPaintDuration, [this]()
         {
             State expected = State::stoppedPainting;
-            if (state.compare_exchange_strong(expected, State::needSwap));
+            if (state.compare_exchange_strong(expected, State::needSwap))
                 BeatOn();
         });
     }

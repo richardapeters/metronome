@@ -131,7 +131,7 @@ namespace application
         infra::Optional<uint8_t> beatsPerMeasure;
         uint8_t noteKind = 0;
 
-        infra::Duration expectedPaintDuration = std::chrono::milliseconds(70);
+        infra::Duration expectedPaintDuration = std::chrono::milliseconds(120);
 
         infra::Optional<RunningState> runningState;
         bool runningRequested = false;
