@@ -11,6 +11,7 @@ namespace hal
 
         RCC->DCKCFGR2 = (RCC->DCKCFGR2 & ~RCC_DCKCFGR2_LPTIM1SEL) | RCC_LPTIM1CLKSOURCE_LSE;
         PWR->CR1 |= PWR_CR1_DBP;
+        __DSB();
         RCC->BDCR |= RCC_BDCR_LSEON;
 
         LPTIM1->CR = LPTIM_CR_ENABLE;
