@@ -1,4 +1,5 @@
 #include "generated/stm32fxxx/PeripheralTable.hpp"
+#include "infra/event/EventDispatcher.hpp"
 #include "metronome/main_stm32f746/SdStm.hpp"
 
 namespace hal
