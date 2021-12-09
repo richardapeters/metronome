@@ -74,7 +74,7 @@ namespace services
 
     infra::TimePoint Ds3231::Convert(TimeData data) const
     {
-        return infra::PartitionedTime(FromBcd(data.year) + 2000, FromBcd(data.month & 0x7f), FromBcd(data.date), FromBcd(data.hours & 0x1f), FromBcd(data.minutes), FromBcd(data.seconds)).ToTimePoint();
+        return infra::PartitionedTime(FromBcd(data.year) + 2000, FromBcd(data.month & 0x7f), FromBcd(data.date), FromBcd(data.hours & 0x3f), FromBcd(data.minutes), FromBcd(data.seconds)).ToTimePoint();
     }
 
     uint8_t Ds3231::FromBcd(uint8_t bcd) const

@@ -10,21 +10,18 @@ namespace services
 {
     class SwitchableSettableTimerService
         : public SettableTimerService
+        , private infra::Timer
     {
     public:
         SwitchableSettableTimerService(uint32_t id, SettableTimerService& delegated)
             : SettableTimerService(id)
+            , infra::Timer(delegated.Id())
             , delegated(delegated)
         {}
 
         void Disable()
         {
             enabled = false;
-        }
-
-        virtual void NextTriggerChanged() override
-        {
-            timer.Start(NextTrigger(), [this]() { Progressed(Now()); });
         }
 
         virtual infra::TimePoint Now() const override
@@ -51,10 +48,25 @@ namespace services
                 onDone();
         }
 
+        virtual void NextTriggerChanged() override
+        {
+            ComputeNextTriggerTime();
+        }
+
+    private:
+        virtual void ComputeNextTriggerTime() override
+        {
+            SetNextTriggerTime(infra::TimerService::NextTrigger(), [this]() { Progressed(Now()); });
+        }
+
+        virtual void Jumped(infra::TimePoint from, infra::TimePoint to) override
+        {
+            infra::TimerService::Jumped(from, to);
+        }
+
     private:
         SettableTimerService& delegated;
         bool enabled = true;
-        infra::TimerSingleShot timer{ delegated.Id() };
     };
 
     class I2cStmHandleLostDevices
