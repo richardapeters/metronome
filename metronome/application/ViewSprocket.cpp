@@ -80,7 +80,7 @@ namespace application
         auto point = ToothCentre(tooth);
         auto& font = infra::freeSans9pt7b;
         canvas.DrawFilledCircle(point, ViewRegion().Size().deltaX / 16, selectedTooth == tooth ? infra::Colour::red : infra::Colour::blue, boundingRegion);
-        canvas.DrawString(point + infra::Vector(-font.Width(value.Storage()) / 2, font.cursorToTop / 2), value.Storage(), font, infra::Colour::white, boundingRegion);
+        canvas.DrawString(point + infra::Vector(-font.Width(value.Storage()) / 2, font.cursorToTop / 2), value.Storage(), font, infra::Colour::white, infra::RightAngle::angle_0, boundingRegion);
     }
 
     infra::Point ViewSprocket::ToothCentre(int sprocket) const

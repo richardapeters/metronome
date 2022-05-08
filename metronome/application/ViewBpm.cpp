@@ -38,7 +38,7 @@ namespace application
         canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 1, ViewRegion().Size().deltaX / 3 + 1, infra::Colour::red, boundingRegion);
 
         auto& font = infra::freeSans24pt7b;
-        canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpmString) / 2, font.cursorToTop / 2), bpmString, font, infra::Colour::blue, boundingRegion);
+        canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpmString) / 2, font.cursorToTop / 2), bpmString, font, infra::Colour::blue, infra::RightAngle::angle_0, boundingRegion);
 
         if (currentSprocket != nullptr)
             currentSprocket->Paint(canvas, boundingRegion);

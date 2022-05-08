@@ -1,3 +1,5 @@
+#include "generated/clicks/Click.hpp"
+#include "generated/clicks/ClickAccent.hpp"
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
@@ -115,14 +117,8 @@ infra::MemoryRange<const int16_t> CreateSoftClick(infra::MemoryRange<const int16
     return result;
 }
 
-extern WavHeader click_accent_start;
-extern uint8_t click_accent_end;
-
-extern WavHeader click_start;
-extern uint8_t click_end;
-
-infra::MemoryRange<const int16_t> clickAccent(ReadClick({ reinterpret_cast<const uint8_t*>(&click_accent_start), &click_accent_end }));
-infra::MemoryRange<const int16_t> click(ReadClick({ reinterpret_cast<const uint8_t*>(&click_start), &click_end }));
+infra::MemoryRange<const int16_t> clickAccent(ReadClick(clicks::clickAccent));
+infra::MemoryRange<const int16_t> click(ReadClick(clicks::click));
 
 int main()
 {

@@ -1,0 +1,90 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "defaults",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "generator": "Ninja Multi-Config",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+      }
+    },
+    {
+      "name": "windows",
+      "displayName": "windows",
+      "description": "Build Metronome for Windows host",
+      "inherits": "defaults",
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x86",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "stm32f746",
+      "displayName": "stm32f746",
+      "description": "Build Metronome for STM32F746",
+      "inherits": "defaults",
+      "toolchainFile": "${sourceDir}/toolchain-arm-gcc.cmake",
+      "warnings": {
+        "dev": false
+      },
+      "cacheVariables": {
+        "emil_DIR": "${sourceDir}/build/windows/_deps/emil-build/cmake",
+        "EMIL_GENERATE_PACKAGE_CONFIG": false,
+        "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
+        "TARGET_MCU": "STM32F746",
+        "TARGET_MCU_FAMILY": "STM32F7xx",
+        "TARGET_BUILD_CORTEX": true
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-Debug",
+      "configuration": "Debug",
+      "configurePreset": "windows"
+    },
+    {
+      "name": "windows-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "windows"
+    },
+    {
+      "name": "windows-MinSizeRel",
+      "configuration": "MinSizeRel",
+      "configurePreset": "windows"
+    },
+    {
+      "name": "STM32F746-Debug",
+      "configuration": "Debug",
+      "configurePreset": "stm32f746"
+    },
+    {
+      "name": "STM32F746-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "stm32f746"
+    },
+    {
+      "name": "STM32F746-MinSizeRel",
+      "configuration": "MinSizeRel",
+      "configurePreset": "stm32f746"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "Tests",
+      "configuration": "Debug",
+      "configurePreset": "windows"
+    }
+  ]
+}

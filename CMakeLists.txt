@@ -1,34 +1,31 @@
-cmake_minimum_required(VERSION 3.2.3)
+cmake_minimum_required(VERSION 3.21)
 
 project(Metronome)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
-include("${CCOLA_DIR}/ccola.inc")
+include(FetchContent)
 
-ccola_programmer(
-    cubeide-j-link
+FetchContent_Declare(
+    emil
+    GIT_REPOSITORY https://github.com/philips-software/embeddedinfralib.git
+    GIT_TAG        2e6476ce00b138411f7e5522bdba09aae011b234
 )
 
-ccola_project(Metronome)
+FetchContent_Declare(
+    preview
+    GIT_REPOSITORY https://github.com/philips-internal/amp-preview.git
+    GIT_TAG        48921dae91ee1d727a0aee83afc9e0127106350d
+)
 
-    ccola_subdirectories(
-        EmbeddedInfraLib/external/args
-        EmbeddedInfraLib/external/googletest
-        EmbeddedInfraLib/external/crypto
-        EmbeddedInfraLib/infra
-        EmbeddedInfraLib/hal
-        EmbeddedInfraLib/services
-        EmbeddedInfraLib/external/protobuf-3.3.0
-        EmbeddedInfraLib/external/protoc-3.3.0
-        EmbeddedInfraLib/protobuf
-        HalSt/hal_st
-        Preview/external/SDL2-2.0.5
-        Preview/preview
-        IoExpander/io_expander
-        local_hal
-        metronome
-        visualizer
-    )
+FetchContent_Declare(
+    halst
+    GIT_REPOSITORY https://github.com/philips-internal/amp-hal-st.git
+    GIT_TAG        5618b6eae9851bcde91b0b664e832825a3e2c147
+)
 
-ccola_end_project()
+FetchContent_MakeAvailable(emil preview halst)
+
+add_subdirectory(local_hal)
+add_subdirectory(metronome)

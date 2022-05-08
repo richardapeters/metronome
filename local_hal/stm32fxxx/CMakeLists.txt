@@ -1,15 +1,20 @@
-ccola_component(stm32fxxx stm32f0xx: static_library stm32f2xx: static_library stm32f3xx: static_library stm32f4xx: static_library stm32f7xx: static_library other: noncompile)
+if (TARGET_BUILD_CORTEX)
 
-    ccola_inheritable_include_directories(../..)
+    add_library(local_hal.stm32fxxx STATIC)
 
-    ccola_sources(
+    target_include_directories(local_hal.stm32fxxx PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/../.."
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+    )
+
+    target_sources(local_hal.stm32fxxx PRIVATE
         SaiStm.cpp
         SaiStm.hpp
     )
 
-    ccola_dependencies(
+    target_link_libraries(local_hal.stm32fxxx PUBLIC
         hal_st.stm32fxxx
         preview.stm32fxxx
     )
 
-ccola_end_component()
+endif()

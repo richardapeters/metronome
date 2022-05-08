@@ -6,6 +6,7 @@
 #include "preview/sdl/DirectDisplaySdl.hpp"
 #include "preview/sdl/LowPowerStrategySdl.hpp"
 #include "preview/sdl/SdlTouchInteractor.hpp"
+#define NOMINMAX
 #include <Windows.h>
 
 class MyTimerService

@@ -1,7 +1,7 @@
 #ifndef METRONOME_LOW_POWER_TIMER_HPP
 #define METRONOME_LOW_POWER_TIMER_HPP
 
-#include "cortex/InterruptCortex.hpp"
+#include "hal_st/cortex/InterruptCortex.hpp"
 #include "infra/timer/Timer.hpp"
 
 namespace hal

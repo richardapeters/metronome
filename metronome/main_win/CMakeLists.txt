@@ -1,17 +1,17 @@
-ccola_component(main_win win: executable other: noncompile)
+if (${CMAKE_SYSTEM_NAME} STREQUAL Windows)
 
-    ccola_sources(
+    add_executable(metronome.main_win WIN32)
+
+    target_sources(metronome.main_win PRIVATE
         DoubleBufferDisplayAdaptedFromDirectDisplay.cpp
         DoubleBufferDisplayAdaptedFromDirectDisplay.hpp
         Main.cpp
     )
 
-    ccola_dependencies(
-        application
+    target_link_libraries(metronome.main_win PUBLIC
+        metronome.application
         hal.generic
         preview.sdl
     )
 
-    set(CCOLA_COMPONENT_SUBSYSTEM WIN32)
-
-ccola_end_component()
+endif()
