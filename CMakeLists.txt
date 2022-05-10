@@ -10,13 +10,13 @@ include(FetchContent)
 FetchContent_Declare(
     emil
     GIT_REPOSITORY https://github.com/philips-software/embeddedinfralib.git
-    GIT_TAG        2e6476ce00b138411f7e5522bdba09aae011b234
+    GIT_TAG        a83e3e3c6f3a8e7508d2c66f234a3f89e2c9f21f
 )
 
 FetchContent_Declare(
     preview
     GIT_REPOSITORY https://github.com/philips-internal/amp-preview.git
-    GIT_TAG        48921dae91ee1d727a0aee83afc9e0127106350d
+    GIT_TAG        e241f8d2fdf52d51b472f0b8e9520386af1d209e
 )
 
 FetchContent_Declare(
