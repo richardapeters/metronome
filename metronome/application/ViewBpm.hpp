@@ -19,8 +19,6 @@ namespace application
         using infra::Observer<BpmSelectionObserver, BpmSelection>::Observer;
 
         virtual void BpmSelected(uint16_t bpm) = 0;
-        virtual void SingleStep(int steps) = 0;
-        virtual void MultiStep(int steps) = 0;
     };
 
     class BpmSelection

@@ -15,22 +15,6 @@ namespace application
         Update();
     }
 
-    void BpmSelectionInteractor::SingleStep(int steps)
-    {
-        bpm += steps;
-        Update();
-    }
-
-    void BpmSelectionInteractor::MultiStep(int steps)
-    {
-        if (steps > 0)
-            bpm += 10 * steps - bpm % 10;
-        else if (steps < 0)
-            bpm += 10 * steps - (bpm - 1) % 10 + 9;
-
-        Update();
-    }
-
     void BpmSelectionInteractor::Update()
     {
         bpm = beatController.MakeBpmValid(bpm);

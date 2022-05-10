@@ -12,8 +12,6 @@ namespace application
         BpmSelectionInteractor(BpmSelection& subject, BeatController& beatController);
 
         virtual void BpmSelected(uint16_t selectedBpm) override;
-        virtual void SingleStep(int steps) override;
-        virtual void MultiStep(int steps) override;
 
     private:
         void Update();

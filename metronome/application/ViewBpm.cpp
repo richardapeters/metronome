@@ -73,9 +73,9 @@ namespace application
                 {
                     currentSprocket = &valueFastUp;
 
-                    fastUpValues[0] = (bpm + 20) / 10 * 10;
-                    fastUpValues[3] = (bpm + 10) / 10 * 10;
-                    fastUpValues[1] = (bpm + 5) / 5 * 5;
+                    fastUpValues[0] = bpm + 20;
+                    fastUpValues[3] = bpm + 10;
+                    fastUpValues[1] = bpm + 5;
 
                     for (int i = 0; i != fastUpValues.size(); ++i)
                         if (!BeatControllerObserver::Subject().BpmIsValid(fastUpValues[i]))
@@ -85,9 +85,9 @@ namespace application
                 {
                     currentSprocket = &valueFastDown;
 
-                    fastDownValues[2] = (bpm - 20 + 9) / 10 * 10;
-                    fastDownValues[3] = (bpm - 10 + 9) / 10 * 10;
-                    fastDownValues[1] = (bpm - 5 + 4) / 5 * 5;
+                    fastDownValues[2] = bpm - 20;
+                    fastDownValues[3] = bpm - 10;
+                    fastDownValues[1] = bpm - 5;
 
                     for (int i = 0; i != fastDownValues.size(); ++i)
                         if (!BeatControllerObserver::Subject().BpmIsValid(fastDownValues[i]))
