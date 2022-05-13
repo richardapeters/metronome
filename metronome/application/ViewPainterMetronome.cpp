@@ -32,8 +32,6 @@ namespace application
 
     void ViewPainterMetronome::ManualPaint()
     {
-        dirtyRegion = infra::Region();
-
         services::BitmapCanvas canvas(display.DrawingBitmap(), bitmapPainter);
         view.Paint(canvas, view.ViewRegion());
         bitmapPainter.WaitUntilDrawingFinished();
@@ -50,8 +48,15 @@ namespace application
 
         if (automaticPainting && !scheduled && !dirtyRegion.Empty())
         {
+            dirtyRegion = infra::Region();
             scheduled = true;
-            infra::EventDispatcher::Instance().Schedule([this]() { Paint(); });
+            infra::EventDispatcher::Instance().Schedule([this]()
+                {
+                    if (automaticPainting)
+                        Paint();
+                    else
+                        scheduled = false;
+                });
         }
     }
 

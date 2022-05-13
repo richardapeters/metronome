@@ -121,13 +121,16 @@ namespace application
             enum class State
             {
                 idle,
-                stoppedPainting,
-                needSwap,
-                swapping
+                stoppedAutomaticPainting,
+                manuallyPainting,
+                readyForSwap,
+                swapping,
+                tooLateForSwapping
             };
 
-            std::atomic<State> state{ State::needSwap };
+            std::atomic<State> state{ State::manuallyPainting };
             bool stopRequested = false;
+            infra::TimePoint beat;
         };
 
     private:

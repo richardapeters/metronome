@@ -80,6 +80,7 @@ namespace application
         {
             runningRequested = false;
             runningState.Emplace(*this);
+            runningState->Beat();
         }
     }
 
@@ -92,6 +93,7 @@ namespace application
     BeatControllerImpl::RunningState::RunningState(BeatControllerImpl& controller)
         : controller(controller)
     {
+        beat = holdPaint.Now();
         PrepareNextBeat();
         controller.MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         BeatOn();
@@ -116,19 +118,19 @@ namespace application
             case State::idle:
                 controller.RunningStopped();
                 break;
-            case State::stoppedPainting:
+            case State::stoppedAutomaticPainting:
                 controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
                 controller.RunningStopped();
                 break;
-            case State::needSwap:
+            case State::manuallyPainting:
+            case State::readyForSwap:
+            case State::tooLateForSwapping:
                 controller.MetronomePainterSubject::GetObserver().SwapLayers([this]()
                 {
                     controller.BeatController::GetObserver().BeatOff();
                     controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
                     controller.RunningStopped();
                 });
-                break;
-            case State::swapping:
                 break;
             default:
                 std::abort();
@@ -137,24 +139,37 @@ namespace application
 
     void BeatControllerImpl::RunningState::Beat()
     {
-        if (state.exchange(State::swapping) == State::needSwap)
+        beat = holdPaint.Now();
+        State expected = State::readyForSwap;
+        if (state.compare_exchange_strong(expected, State::readyForSwap))
             SwapLayers();
+        else
+        {
+            State expected = State::stoppedAutomaticPainting;
+            state.compare_exchange_strong(expected, State::tooLateForSwapping);
+        }
     }
 
     void BeatControllerImpl::RunningState::PrepareNextBeat()
     {
-        holdPaint.Start(std::chrono::microseconds(60000000 / controller.bpm) - 2 * controller.expectedPaintDuration, [this]()
+        holdPaint.Start(beat + std::chrono::microseconds(60000000 / controller.bpm) - 2 * controller.expectedPaintDuration, [this]()
         {
             State expected = State::idle;
-            if (state.compare_exchange_strong(expected, State::stoppedPainting))
+            if (state.compare_exchange_strong(expected, State::stoppedAutomaticPainting))
                 controller.MetronomePainterSubject::GetObserver().StopAutomaticPainting();
         });
 
-        prepareBeat.Start(std::chrono::microseconds(60000000 / controller.bpm) - controller.expectedPaintDuration, [this]()
+        prepareBeat.Start(beat + std::chrono::microseconds(60000000 / controller.bpm) - controller.expectedPaintDuration, [this]()
         {
-            State expected = State::stoppedPainting;
-            if (state.compare_exchange_strong(expected, State::needSwap))
+            State expected = State::stoppedAutomaticPainting;
+            if (state.compare_exchange_strong(expected, State::manuallyPainting))
                 BeatOn();
+            else
+            {
+                State expected = State::tooLateForSwapping;
+                if (state.compare_exchange_strong(expected, State::tooLateForSwapping))
+                    BeatOn();
+            }
         });
     }
 
@@ -162,6 +177,14 @@ namespace application
     {
         controller.BeatController::GetObserver().BeatOn();
         controller.MetronomePainterSubject::GetObserver().ManualPaint();
+
+        State expected = State::manuallyPainting;
+        if (!state.compare_exchange_strong(expected, State::readyForSwap))
+        {
+            State expected = State::tooLateForSwapping;
+            if (state.compare_exchange_strong(expected, State::idle))
+                SwapLayers();
+        }
     }
 
     void BeatControllerImpl::RunningState::SwapLayers()
@@ -171,8 +194,11 @@ namespace application
             state = State::idle;
             controller.MetronomePainterSubject::GetObserver().StartAutomaticPainting();
 
-            PrepareNextBeat();
-            beatOff.Start(std::chrono::milliseconds(30), [this]() { controller.BeatController::GetObserver().BeatOff(); });
+            beatOff.Start(beat + std::chrono::milliseconds(30), [this]()
+                {
+                    controller.BeatController::GetObserver().BeatOff();
+                    PrepareNextBeat();
+                });
             if (stopRequested)
                 controller.RunningStopped();
         });
