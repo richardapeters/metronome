@@ -11,9 +11,6 @@ namespace application
     {
         services::TouchSpinInteger::WithViewFadingText::WithStorage<1>::Report(steps, from);
 
-        if (previousValue != Value())
-            NotifyObservers([this](ViewNoteKindObserver& observer) { observer.SelectedNoteKind(Value()); });
-
-        previousValue = Value();
+        NotifyObservers([this](ViewNoteKindObserver& observer) { observer.SelectedNoteKind(Value()); });
     }
 }

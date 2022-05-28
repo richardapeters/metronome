@@ -40,12 +40,9 @@ namespace application
     {
         Parent::Report(steps, from);
 
-        if (steps != 0)
-        {
-            touchRemainedAtStart = false;
+        touchRemainedAtStart = false;
 
-            if (enabled)
-                NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
-        }
+        if (enabled)
+            NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
     }
 }

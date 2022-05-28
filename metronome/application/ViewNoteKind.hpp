@@ -26,9 +26,6 @@ namespace application
 
     protected:
         virtual void Report(int32_t steps, services::Direction from) override;
-
-    private:
-        int32_t previousValue = 0;
     };
 }
 
