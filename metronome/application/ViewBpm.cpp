@@ -12,13 +12,62 @@ namespace application
 
     const std::array<uint16_t, 8> ViewBpm::selectValues = { { 80, 90, 100, 120, 140, 160, 60, 70 } };
 
-    ViewBpm::ViewBpm(BeatController& controller)
+    void ViewTimeline::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
+    {
+        for (const auto& line : lines)
+            canvas.DrawLine(line.first, line.second, infra::Colour::darkGray, boundingRegion);
+
+        for (const auto& note : notes)
+            canvas.DrawFilledRectangle(infra::Region(note, infra::Vector(3, 3)), infra::Colour::black, boundingRegion);
+    }
+
+    void ViewTimeline::ViewRegionChanged()
+    {
+        lines.clear();
+
+        while (!lines.full())
+        {
+            auto position = lines.size();
+            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5;
+            auto arc = 2 * pi * position / lines.max_size() + 2 * pi / 4;
+
+            lines.push_back({ infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre), infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre + 10 - 8 * (position % 2)) });
+        }
+
+        //notes.clear();
+
+        //auto arc = 2 * pi / 64 - 2 * pi / 4;
+        //auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5;
+
+        //notes.push_back(infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre));
+    }
+
+    void ViewTimeline::NotesChanged(infra::MemoryRange<const Note> newNotes)
+    {
+        notes.clear();
+
+        for (auto note : newNotes)
+        {
+            if (notes.full())
+                break;
+
+            auto arc = 2 * pi / std::numeric_limits<uint16_t>::max() * note.moment - 2 * pi / 4;
+            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5;
+
+            notes.push_back(infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre));
+        }
+
+        Dirty(ViewRegion());
+    }
+
+    ViewBpm::ViewBpm(BeatController& controller, Notes& notes)
         : BeatControllerObserver(controller)
         , valueSelect(selectValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastUp(fastUpValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastDown(fastDownValues, [this](uint16_t value) { Select(value); }, 0)
         , valueSlowUp(slowUpValues, [this](uint16_t value) { Select(value); }, 1)
         , valueSlowDown(slowDownValues, [this](uint16_t value) { Select(value); }, 3)
+        , timeline(notes)
     {
         valueSelect.SetParent(*this);
         valueFastUp.SetParent(*this);
@@ -42,6 +91,8 @@ namespace application
 
         if (currentSprocket != nullptr)
             currentSprocket->Paint(canvas, boundingRegion);
+
+        timeline.Paint(canvas, boundingRegion);
     }
 
     void ViewBpm::ViewRegionChanged()
@@ -51,6 +102,7 @@ namespace application
         valueFastDown.SetViewRegion(ViewRegion());
         valueSlowUp.SetViewRegion(ViewRegion());
         valueSlowDown.SetViewRegion(ViewRegion());
+        timeline.SetViewRegion(ViewRegion());
     }
 
     void ViewBpm::StartTouch(infra::Point point)

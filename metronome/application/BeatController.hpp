@@ -29,12 +29,14 @@ namespace application
     class MetronomeBeatTimer;
 
     class BeatTimerObserver
-        : public infra::SingleObserver<BeatTimerObserver, MetronomeBeatTimer>
+        : public infra::Observer<BeatTimerObserver, MetronomeBeatTimer>
     {
     public:
-        using infra::SingleObserver<BeatTimerObserver, MetronomeBeatTimer>::SingleObserver;
+        using infra::Observer<BeatTimerObserver, MetronomeBeatTimer>::Observer;
 
         virtual void Beat() = 0;
+        virtual void Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) = 0;
+        virtual void Stopped() = 0;
     };
 
     class MetronomeBeatTimer
@@ -91,7 +93,10 @@ namespace application
         virtual void DisabledBeatsPerMinute() override;
         virtual void SelectedNoteKind(uint8_t noteKind) override;
 
+        // Implementation of BeatTimerObserver
         virtual void Beat() override;
+        virtual void Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) override;
+        virtual void Stopped() override;
 
     private:
         void EvaluateRunningRequested();

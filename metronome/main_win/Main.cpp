@@ -79,13 +79,58 @@ private:
 
 void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind)
 {
-    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]() { GetObserver().Beat(); }, infra::triggerImmediately);
+    NotifyObservers([bpm, beatsPerMeasure](auto& observer) { observer.Started(bpm, beatsPerMeasure); });
+    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]()
+        {
+            NotifyObservers([](auto& observer) { observer.Beat(); });
+        }, infra::triggerImmediately);
 }
 
 void BeatTimerStub::Stop()
 {
+    NotifyObservers([](auto& observer) { observer.Stopped(); });
     timer.Cancel();
 }
+
+class SerialCommunication8Beat
+    : public hal::SerialCommunication
+{
+public:
+    virtual void SendData(infra::ConstByteRange data, infra::Function<void()> actionOnCompletion) override
+    {}
+
+    virtual void ReceiveData(infra::Function<void(infra::ConstByteRange data)> dataReceived) override
+    {
+        this->dataReceived = dataReceived;
+    }
+
+private:
+    void Beat()
+    {
+        dataReceived(infra::MakeRange(*currentBeat));
+        ++currentBeat;
+        if (currentBeat == groove.end())
+            currentBeat = groove.begin();
+    }
+
+private:
+    std::array<std::array<uint8_t, 3>, 8> groove
+    { {
+        {{ 0x99, 0x2a, 0x10 }},
+        {{ 0x99, 0x2b, 0x10 }},
+        {{ 0x99, 0x2c, 0x10 }},
+        {{ 0x99, 0x2b, 0x10 }},
+        {{ 0x99, 0x2a, 0x10 }},
+        {{ 0x99, 0x2a, 0x10 }},
+        {{ 0x99, 0x2c, 0x10 }},
+        {{ 0x99, 0x2b, 0x10 }}
+    } };
+
+private:
+    infra::Function<void(infra::ConstByteRange data)> dataReceived;
+    infra::TimerRepeating timer{ infra::Duration(std::chrono::minutes(1)) / 120 / 2, [this]() { Beat(); } };
+    decltype(groove)::const_iterator currentBeat{ groove.begin() };
+};
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -99,7 +144,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     BeatTimerStub beatTimer;
     services::DoubleBufferDisplayAdaptedFromDirectDisplay::WithStorage<480, 272, infra::PixelFormat::rgb565> displayAdapter(display);
     hal::BitmapPainterCanonical bitmapPainter;
-    main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter);
+    SerialCommunication8Beat serialMidi;
+    main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter, serialMidi);
     services::SdlTouchInteractor touchInteractor(lowPowerStrategy, metronome.touch);
 
     eventDispatcher.Run();

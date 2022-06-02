@@ -74,6 +74,12 @@ namespace application
             runningState->Beat();
     }
 
+    void BeatControllerImpl::Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
+    {}
+
+    void BeatControllerImpl::Stopped()
+    {}
+
     void BeatControllerImpl::EvaluateRunningRequested()
     {
         if (runningRequested && !runningState)

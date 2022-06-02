@@ -3,6 +3,7 @@
 
 #include "metronome/application/BpmSelectionInteractor.hpp"
 #include "metronome/application/Ds3231.hpp"
+#include "metronome/application/NotesMidi.hpp"
 #include "metronome/application/ViewBeatsPerMeasure.hpp"
 #include "metronome/application/ViewBpm.hpp"
 #include "metronome/application/ViewDateEntry.hpp"
@@ -52,16 +53,18 @@ namespace main_
 {
     struct Metronome
     {
-        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer, hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter);
+        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer,
+            hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi);
 
         void StartTimeEntry();
         void StopTimeEntry(infra::TimePoint newTime);
 
         application::BeatControllerImpl beatController;
+        application::NotesMidi notes;
         services::TouchViewMultiple::WithMaxViews<2> touch;
         application::ViewPainterMetronome viewPainter;
         services::TouchHorizontalLayout::WithMaxViews<2> touchBpm;
-        application::ViewBpm viewBpm{ beatController };
+        application::ViewBpm viewBpm{ beatController, notes };
         application::BpmSelectionInteractor bpmSelectionObserver{ viewBpm, beatController };
         services::TouchVerticalLayout::WithMaxViews<3> touchVertical;
         services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalTop;

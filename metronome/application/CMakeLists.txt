@@ -16,6 +16,8 @@ target_sources(metronome.application PRIVATE
     Metronome.hpp
     NoteFont.cpp
     NoteFont.hpp
+    NotesMidi.cpp
+    NotesMidi.hpp
     StuckI2cReleaser.cpp
     StuckI2cReleaser.hpp
     TouchFt5x06.cpp
