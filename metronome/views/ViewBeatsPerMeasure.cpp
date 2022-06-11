@@ -1,4 +1,4 @@
-#include "metronome/application/ViewBeatsPerMeasure.hpp"
+#include "metronome/views/ViewBeatsPerMeasure.hpp"
 #include "preview/fonts/Fonts.hpp"
 
 namespace application

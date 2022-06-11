@@ -7,7 +7,7 @@
 #include "preview/views/ViewAligned.hpp"
 #include "preview/views/ViewIcon.hpp"
 #include "preview/views/ViewPanel.hpp"
-#include "metronome/application/ViewBpm.hpp"
+#include "metronome/views/ViewBpm.hpp"
 
 namespace application
 {

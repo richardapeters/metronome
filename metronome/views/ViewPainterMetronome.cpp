@@ -1,5 +1,5 @@
 #include "infra/event/EventDispatcher.hpp"
-#include "metronome/application/ViewPainterMetronome.hpp"
+#include "metronome/views/ViewPainterMetronome.hpp"
 #include "preview/interfaces/BitmapCanvas.hpp"
 
 namespace application

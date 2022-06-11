@@ -14,32 +14,12 @@ target_sources(metronome.application PRIVATE
     Ds3231.hpp
     Metronome.cpp
     Metronome.hpp
-    NoteFont.cpp
-    NoteFont.hpp
     NotesMidi.cpp
     NotesMidi.hpp
     StuckI2cReleaser.cpp
     StuckI2cReleaser.hpp
     TouchFt5x06.cpp
     TouchFt5x06.hpp
-    ViewBeatsPerMeasure.cpp
-    ViewBeatsPerMeasure.hpp
-    ViewBpm.cpp
-    ViewBpm.hpp
-    ViewDateEntry.cpp
-    ViewDateEntry.hpp
-    ViewNoteKind.cpp
-    ViewNoteKind.hpp
-    ViewPainterMetronome.cpp
-    ViewPainterMetronome.hpp
-    ViewSprocket.cpp
-    ViewSprocket.hpp
-    ViewStart.cpp
-    ViewStart.hpp
-    ViewTapMeasurement.cpp
-    ViewTapMeasurement.hpp
-    ViewTimeline.cpp
-    ViewTimeline.hpp
     Wm8994.cpp
     Wm8994.hpp
 )
@@ -48,4 +28,5 @@ target_link_libraries(metronome.application PUBLIC
     preview.fonts
     preview.touch
     services.util
+    metronome.views
 )

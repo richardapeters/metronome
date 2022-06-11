@@ -16,7 +16,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     preview
     GIT_REPOSITORY https://github.com/philips-internal/amp-preview.git
-    GIT_TAG        546c9aa2739a9d5151b66eb9d388e41b6d675708
+    GIT_TAG        402201f7e054bf819756a56dd5e1504a9788f073
 )
 
 FetchContent_Declare(

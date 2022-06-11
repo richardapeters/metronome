@@ -1,4 +1,4 @@
-#include "metronome/application/ViewStart.hpp"
+#include "metronome/views/ViewStart.hpp"
 #include "preview/fonts/Fonts.hpp"
 #include <numeric>
 

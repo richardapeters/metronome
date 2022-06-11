@@ -1,5 +1,5 @@
 #include "infra/stream/StringOutputStream.hpp"
-#include "metronome/application/ViewSprocket.hpp"
+#include "metronome/views/ViewSprocket.hpp"
 #include "preview/fonts/Fonts.hpp"
 #include <cmath>
 

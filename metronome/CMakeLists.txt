@@ -1,4 +1,5 @@
 add_subdirectory(interfaces)
+add_subdirectory(views)
 add_subdirectory(application)
 add_subdirectory(main_win)
 add_subdirectory(main_stm32f746)

@@ -1,7 +1,8 @@
 #ifndef METRONOME_BPM_SELECTION_INTERACTOR_HPP
 #define METRONOME_BPM_SELECTION_INTERACTOR_HPP
 
-#include "metronome/application/ViewBpm.hpp"
+#include "metronome/interfaces/BeatController.hpp"
+#include "metronome/interfaces/BpmSelection.hpp"
 
 namespace application
 {

@@ -1,4 +1,4 @@
-#include "metronome/application/NoteFont.hpp"
+#include "metronome/views/NoteFont.hpp"
 
 namespace application
 {

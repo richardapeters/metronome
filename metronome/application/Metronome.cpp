@@ -1,7 +1,5 @@
 #include "infra/stream/StringOutputStream.hpp"
 #include "metronome/application/Metronome.hpp"
-#include "metronome/application/NoteFont.hpp"
-#include "preview/fonts/Fonts.hpp"
 
 namespace application
 {

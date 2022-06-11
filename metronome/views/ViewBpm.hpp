@@ -1,10 +1,10 @@
 #ifndef METRONOME_VIEW_BPM_HPP
 #define METRONOME_VIEW_BPM_HPP
 
-#include "metronome/application/ViewSprocket.hpp"
-#include "metronome/application/ViewTimeline.hpp"
 #include "metronome/interfaces/BeatController.hpp"
 #include "metronome/interfaces/BpmSelection.hpp"
+#include "metronome/views/ViewSprocket.hpp"
+#include "metronome/views/ViewTimeline.hpp"
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
 

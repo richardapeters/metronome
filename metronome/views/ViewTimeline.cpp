@@ -1,4 +1,4 @@
-#include "metronome/application/ViewTimeline.hpp"
+#include "metronome/views/ViewTimeline.hpp"
 #include <cmath>
 
 namespace application

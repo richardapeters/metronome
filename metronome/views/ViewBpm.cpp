@@ -1,5 +1,5 @@
 #include "infra/stream/StringOutputStream.hpp"
-#include "metronome/application/ViewBpm.hpp"
+#include "metronome/views/ViewBpm.hpp"
 #include "preview/fonts/Fonts.hpp"
 
 namespace application

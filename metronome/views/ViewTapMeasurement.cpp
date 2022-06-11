@@ -1,4 +1,4 @@
-#include "metronome/application/ViewTapMeasurement.hpp"
+#include "metronome/views/ViewTapMeasurement.hpp"
 #include "preview/fonts/Fonts.hpp"
 #include <numeric>
 

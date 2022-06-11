@@ -1,5 +1,5 @@
 #include "infra/timer/PartitionedTime.hpp"
-#include "metronome/application/ViewDateEntry.hpp"
+#include "metronome/views/ViewDateEntry.hpp"
 
 namespace application
 {
