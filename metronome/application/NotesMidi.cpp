@@ -1,6 +1,7 @@
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/util/BitLogic.hpp"
 #include "metronome/application/NotesMidi.hpp"
+#include <algorithm>
 
 namespace application
 {
@@ -19,9 +20,15 @@ namespace application
         auto newBeatStart = infra::Now();
         beatDuration = newBeatStart - beatStart;
         beatStart = newBeatStart;
+
         ++beatInMeasure;
         if (beatInMeasure == beatsPerMeasure)
             beatInMeasure = 0;
+
+        auto startErase = beatInMeasure * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
+        auto endErase = (beatInMeasure + 1) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
+
+        notes.erase(std::remove_if(notes.begin(), notes.end(), [startErase, endErase](auto note) { return note.moment >= startErase && note.moment <= endErase; }), notes.end());
     }
 
     void NotesMidi::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
@@ -29,7 +36,7 @@ namespace application
         beatDuration = infra::Duration(std::chrono::minutes(1)) / bpm;
         beatStart = infra::Now() - beatDuration;
         beatsPerMeasure = newBeatsPerMeasure.ValueOr(4);
-        beatInMeasure = 0;
+        beatInMeasure = beatsPerMeasure - 1;
         running = true;
     }
 
