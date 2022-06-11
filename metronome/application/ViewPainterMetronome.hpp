@@ -1,7 +1,7 @@
 #ifndef METRONOME_VIEW_PAINTER_METRONOME_HPP
 #define METRONOME_VIEW_PAINTER_METRONOME_HPP
 
-#include "metronome/application/BeatController.hpp"
+#include "metronome/interfaces/MetronomePainter.hpp"
 #include "preview/interfaces/BitmapPainter.hpp"
 #include "preview/interfaces/DoubleBufferDisplay.hpp"
 #include "preview/interfaces/View.hpp"

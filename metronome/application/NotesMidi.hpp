@@ -2,8 +2,10 @@
 #define METRONOME_NOTES_MIDI_HPP
 
 #include "hal/interfaces/SerialCommunication.hpp"
-#include "metronome/application/BeatController.hpp"
-#include "metronome/application/ViewBpm.hpp"
+#include "infra/timer/Timer.hpp"
+#include "infra/util/BoundedVector.hpp"
+#include "metronome/interfaces/BeatTimer.hpp"
+#include "metronome/interfaces/Notes.hpp"
 
 namespace application
 {
@@ -12,7 +14,7 @@ namespace application
         , public BeatTimerObserver
     {
     public:
-        NotesMidi(hal::SerialCommunication& serial, MetronomeBeatTimer& beatTimer);
+        NotesMidi(hal::SerialCommunication& serial, BeatTimer& beatTimer);
 
         // Implementation of BeatTimerObserver
         virtual void Beat() override;

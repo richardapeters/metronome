@@ -1,10 +1,10 @@
 #include "infra/event/EventDispatcher.hpp"
-#include "metronome/application/BeatController.hpp"
+#include "metronome/application/BeatControllerImpl.hpp"
 #include "services/tracer/GlobalTracer.hpp"
 
 namespace application
 {
-    BeatControllerImpl::BeatControllerImpl(MetronomeBeatTimer& beatTimer)
+    BeatControllerImpl::BeatControllerImpl(BeatTimer& beatTimer)
         : BeatTimerObserver(beatTimer)
     {}
 

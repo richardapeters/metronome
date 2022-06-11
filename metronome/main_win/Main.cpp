@@ -67,7 +67,7 @@ private:
 };
 
 class BeatTimerStub
-    : public application::MetronomeBeatTimer
+    : public application::BeatTimer
 {
 public:
     virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) override;

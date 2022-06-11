@@ -37,7 +37,7 @@ namespace application
 
 namespace main_
 {
-    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer,
+    Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer,
         hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi)
         : beatController(beatTimer)
         , notes(serialMidi, beatTimer)

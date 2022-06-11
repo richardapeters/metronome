@@ -2,13 +2,13 @@
 #define METRONOME_METRONOME_BEAT_TIMER_STM_HPP
 
 #include "local_hal/stm32fxxx/SaiStm.hpp"
-#include "metronome/application/BeatController.hpp"
+#include "metronome/interfaces/BeatTimer.hpp"
 #include "metronome/main_stm32f746/LowPowerTimer.hpp"
 
 namespace application
 {
     class MetronomeBeatTimerStm
-        : public MetronomeBeatTimer
+        : public BeatTimer
         , private hal::LowPowerTimer
     {
     public:

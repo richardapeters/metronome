@@ -5,7 +5,7 @@
 
 namespace application
 {
-    NotesMidi::NotesMidi(hal::SerialCommunication& serial, MetronomeBeatTimer& beatTimer)
+    NotesMidi::NotesMidi(hal::SerialCommunication& serial, BeatTimer& beatTimer)
         : BeatTimerObserver(beatTimer)
     {
         serial.ReceiveData([this](infra::ConstByteRange data)

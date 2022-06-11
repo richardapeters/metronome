@@ -1,74 +1,15 @@
 #ifndef METRONOME_VIEW_BPM_HPP
 #define METRONOME_VIEW_BPM_HPP
 
-#include "infra/util/BoundedVector.hpp"
-#include "infra/util/Observer.hpp"
-#include "infra/timer/Timer.hpp"
-#include "metronome/application/BeatController.hpp"
 #include "metronome/application/ViewSprocket.hpp"
+#include "metronome/application/ViewTimeline.hpp"
+#include "metronome/interfaces/BeatController.hpp"
+#include "metronome/interfaces/BpmSelection.hpp"
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
 
 namespace application
 {
-    class BpmSelection;
-
-    class BpmSelectionObserver
-        : public infra::Observer<BpmSelectionObserver, BpmSelection>
-    {
-    public:
-        using infra::Observer<BpmSelectionObserver, BpmSelection>::Observer;
-
-        virtual void BpmSelected(uint16_t bpm) = 0;
-    };
-
-    class BpmSelection
-        : public infra::Subject<BpmSelectionObserver>
-    {
-    public:
-        virtual void SetBpm(uint16_t bpm) = 0;
-    };
-
-    struct Note
-    {
-        uint16_t moment;
-        uint8_t pitch;
-    };
-
-    class Notes;
-
-    class NotesObserver
-        : public infra::SingleObserver<NotesObserver, Notes>
-    {
-    public:
-        using infra::SingleObserver<NotesObserver, Notes>::SingleObserver;
-
-        virtual void NotesChanged(infra::MemoryRange<const Note> newNotes) = 0;
-    };
-
-    class Notes
-        : public infra::Subject<NotesObserver>
-    {};
-
-    class ViewTimeline
-        : public services::View
-        , public NotesObserver
-    {
-    public:
-        using NotesObserver::NotesObserver;
-
-        // Implementation of View
-        virtual void Paint(hal::Canvas& canvas, infra::Region boundingRegion) override;
-        virtual void ViewRegionChanged() override;
-
-        // Implementation of NotesObserver
-        virtual void NotesChanged(infra::MemoryRange<const Note> newNotes) override;
-
-    private:
-        infra::BoundedVector<std::pair<infra::Point, infra::Point>>::WithMaxSize<16> lines;
-        infra::BoundedVector<infra::Point>::WithMaxSize<128> notes;
-    };
-
     class ViewBpm
         : public services::View
         , public services::TouchRecipient

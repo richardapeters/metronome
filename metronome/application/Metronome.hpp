@@ -1,6 +1,7 @@
 #ifndef METRONOME_METRONOME_HPP
 #define METRONOME_METRONOME_HPP
 
+#include "metronome/application/BeatControllerImpl.hpp"
 #include "metronome/application/BpmSelectionInteractor.hpp"
 #include "metronome/application/Ds3231.hpp"
 #include "metronome/application/NotesMidi.hpp"
@@ -53,7 +54,7 @@ namespace main_
 {
     struct Metronome
     {
-        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::MetronomeBeatTimer& beatTimer,
+        Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer,
             hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi);
 
         void StartTimeEntry();

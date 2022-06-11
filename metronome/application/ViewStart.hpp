@@ -5,7 +5,7 @@
 #include "preview/views/ViewAligned.hpp"
 #include "preview/views/ViewIcon.hpp"
 #include "preview/views/ViewPanel.hpp"
-#include "metronome/application/BeatController.hpp"
+#include "metronome/interfaces/BeatController.hpp"
 
 namespace application
 {

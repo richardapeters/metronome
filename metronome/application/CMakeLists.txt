@@ -6,8 +6,8 @@ target_include_directories(metronome.application PUBLIC
 )
 
 target_sources(metronome.application PRIVATE
-    BeatController.cpp
-    BeatController.hpp
+    BeatControllerImpl.cpp
+    BeatControllerImpl.hpp
     BpmSelectionInteractor.cpp
     BpmSelectionInteractor.hpp
     Ds3231.cpp
@@ -38,6 +38,8 @@ target_sources(metronome.application PRIVATE
     ViewStart.hpp
     ViewTapMeasurement.cpp
     ViewTapMeasurement.hpp
+    ViewTimeline.cpp
+    ViewTimeline.hpp
     Wm8994.cpp
     Wm8994.hpp
 )
