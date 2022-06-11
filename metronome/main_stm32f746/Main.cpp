@@ -1,6 +1,7 @@
 #include "generated/clicks/Click.hpp"
 #include "generated/clicks/ClickAccent.hpp"
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
+#include "hal_st/stm32fxxx/UartStm.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
 #include "infra/stream/ByteInputStream.hpp"
@@ -139,11 +140,16 @@ int main()
 
     static infra::MemoryRange<const int16_t> softClick = CreateSoftClick(click);
 
+    static hal::GpioPinStm midiRx(hal::Port::C, 7);
+    static hal::UartStm::Config config;
+    config.baudrate = 31250;
+    static hal::UartStm midi(dma, 6, hal::dummyPinStm, midiRx, config);
+
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
         static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
-        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter);
+        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter, midi);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
     });
 
