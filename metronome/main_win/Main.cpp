@@ -1,6 +1,6 @@
 #include "hal/generic/TimerServiceGeneric.hpp"
 #include "infra/event/LowPowerEventDispatcher.hpp"
-#include "metronome/application/Metronome.hpp"
+#include "metronome/instantiations/Metronome.hpp"
 #include "metronome/main_win/DoubleBufferDisplayAdaptedFromDirectDisplay.hpp"
 #include "preview/sdl/DirectDisplaySdl.hpp"
 #include "preview/sdl/LowPowerStrategySdl.hpp"

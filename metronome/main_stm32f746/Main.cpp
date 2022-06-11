@@ -4,7 +4,7 @@
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
 #include "infra/stream/ByteInputStream.hpp"
-#include "metronome/application/Metronome.hpp"
+#include "metronome/instantiations/Metronome.hpp"
 #include "metronome/application/Wm8994.hpp"
 #include "metronome/main_stm32f746/Flash.hpp"
 #include "metronome/main_stm32f746/Lcd.hpp"

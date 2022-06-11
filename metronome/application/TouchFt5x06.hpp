@@ -4,7 +4,7 @@
 #include "hal/interfaces/Gpio.hpp"
 #include "hal/interfaces/I2c.hpp"
 #include "preview/interfaces/Geometry.hpp"
-#include "Preview/touch/TouchRecipient.hpp"
+#include "preview/touch/TouchRecipient.hpp"
 
 namespace application
 {

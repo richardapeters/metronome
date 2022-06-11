@@ -12,8 +12,6 @@ target_sources(metronome.application PRIVATE
     BpmSelectionInteractor.hpp
     Ds3231.cpp
     Ds3231.hpp
-    Metronome.cpp
-    Metronome.hpp
     NotesMidi.cpp
     NotesMidi.hpp
     StuckI2cReleaser.cpp
@@ -25,8 +23,7 @@ target_sources(metronome.application PRIVATE
 )
 
 target_link_libraries(metronome.application PUBLIC
-    preview.fonts
-    preview.touch
     services.util
-    metronome.views
+    metronome.interfaces
+    preview.touch
 )

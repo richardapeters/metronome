@@ -1,5 +1,4 @@
-#include "infra/stream/StringOutputStream.hpp"
-#include "metronome/application/Metronome.hpp"
+#include "metronome/instantiations/Metronome.hpp"
 
 namespace application
 {
