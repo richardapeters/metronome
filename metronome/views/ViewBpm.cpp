@@ -25,12 +25,7 @@ namespace application
     void ViewBpm::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
     {
         canvas.DrawFilledRectangle(ViewRegion(), backgroundColour, boundingRegion);
-
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 + 2, ViewRegion().Size().deltaX / 3 + 3, BetweenColour(infra::Colour::red, infra::Colour::white, 192), boundingRegion);
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 3, ViewRegion().Size().deltaX / 3 - 2, BetweenColour(infra::Colour::red, infra::Colour::white, 192), boundingRegion);
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 + 1, ViewRegion().Size().deltaX / 3 + 2, BetweenColour(infra::Colour::red, infra::Colour::white, 64), boundingRegion);
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 2, ViewRegion().Size().deltaX / 3 - 1, BetweenColour(infra::Colour::red, infra::Colour::white, 64), boundingRegion);
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 1, ViewRegion().Size().deltaX / 3 + 1, infra::Colour::red, boundingRegion);
+        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 2, ViewRegion().Size().deltaX / 3 + 2, infra::Colour::red, boundingRegion);
 
         auto& font = infra::freeSans24pt7b;
         canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpmString) / 2, font.cursorToTop / 2), bpmString, font, infra::Colour::blue, infra::RightAngle::angle_0, boundingRegion);

@@ -6,6 +6,8 @@
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
 
+//#define SHOW_PITCH
+
 namespace application
 {
     class ViewTimeline
@@ -23,8 +25,15 @@ namespace application
         virtual void NotesChanged(infra::MemoryRange<const Note> newNotes) override;
 
     private:
+        uint8_t PitchToDistance(uint8_t pitch) const;
+
+    private:
         infra::BoundedVector<std::pair<infra::Point, infra::Point>>::WithMaxSize<16> lines;
-        infra::BoundedVector<infra::Point>::WithMaxSize<128> notes;
+        infra::BoundedVector<infra::Region>::WithMaxSize<128> notes;
+
+#ifdef SHOW_PITCH
+        infra::Optional<uint8_t> lastPitch;
+#endif
     };
 }
 

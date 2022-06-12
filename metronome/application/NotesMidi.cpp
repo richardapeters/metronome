@@ -65,7 +65,7 @@ namespace application
                 infra::EventDispatcher::Instance().Schedule([this, note]()
                     {
                         if (running)
-                            AddNote(Note{ note });
+                            AddNote(note);
                     });
             }
             else if (state == State::receivedPitch)
