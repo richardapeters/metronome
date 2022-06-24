@@ -39,6 +39,7 @@ namespace main_
         : beatController(beatTimer)
         , notes(serialMidi, beatTimer)
         , viewPainter(display, bitmapPainter, touch.GetView(), beatController)
+        , viewBpm(beatController, notes, bitmapPainter)
         , viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
         , localTime(localTime)
     {

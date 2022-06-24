@@ -17,7 +17,7 @@ namespace application
         , public BeatControllerObserver
     {
     public:
-        ViewBpm(BeatController& controller, Notes& notes);
+        ViewBpm(BeatController& controller, Notes& notes, hal::BitmapPainter& painter);
 
         // Implementation of View
         virtual void Paint(hal::Canvas& canvas, infra::Region boundingRegion) override;

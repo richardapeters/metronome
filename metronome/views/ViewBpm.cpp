@@ -6,14 +6,14 @@ namespace application
 {
     const std::array<uint16_t, 8> ViewBpm::selectValues = { { 80, 90, 100, 120, 140, 160, 60, 70 } };
 
-    ViewBpm::ViewBpm(BeatController& controller, Notes& notes)
+    ViewBpm::ViewBpm(BeatController& controller, Notes& notes, hal::BitmapPainter& painter)
         : BeatControllerObserver(controller)
         , valueSelect(selectValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastUp(fastUpValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastDown(fastDownValues, [this](uint16_t value) { Select(value); }, 0)
         , valueSlowUp(slowUpValues, [this](uint16_t value) { Select(value); }, 1)
         , valueSlowDown(slowDownValues, [this](uint16_t value) { Select(value); }, 3)
-        , timeline(notes)
+        , timeline(notes, painter)
     {
         valueSelect.SetParent(*this);
         valueFastUp.SetParent(*this);
@@ -33,7 +33,8 @@ namespace application
         if (currentSprocket != nullptr)
             currentSprocket->Paint(canvas, boundingRegion);
 
-        timeline.Paint(canvas, boundingRegion);
+        if (backgroundColour == infra::Colour::white)
+            timeline.Paint(canvas, boundingRegion);
     }
 
     void ViewBpm::ViewRegionChanged()

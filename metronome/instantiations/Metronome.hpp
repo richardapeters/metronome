@@ -65,7 +65,7 @@ namespace main_
         services::TouchViewMultiple::WithMaxViews<2> touch;
         application::ViewPainterMetronome viewPainter;
         services::TouchHorizontalLayout::WithMaxViews<2> touchBpm;
-        application::ViewBpm viewBpm{ beatController, notes };
+        application::ViewBpm viewBpm;
         application::BpmSelectionInteractor bpmSelectionObserver{ viewBpm, beatController };
         services::TouchVerticalLayout::WithMaxViews<3> touchVertical;
         services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalTop;
