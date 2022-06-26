@@ -15,32 +15,27 @@ namespace application
         : NotesObserver(notes)
     {
         {
-            services::BitmapCanvas canvas(noteBase, painter);
-            auto region = infra::Region(infra::Point(), canvas.Size());
-            canvas.DrawFilledRectangle(region, infra::Colour::white, region);
-            canvas.DrawFilledRectangle(infra::Region(0, 1, 3, 4), infra::Colour::black, region);
-            canvas.DrawLine(infra::Point(0, 1), infra::Point(5, 1), infra::Colour::black, region);
-        }
-
-        {
             services::BitmapCanvas canvas(noteTom, painter);
             auto region = infra::Region(infra::Point(), canvas.Size());
-            canvas.DrawFilledRectangle(region, infra::Colour::black, region);
+            canvas.DrawFilledRectangle(region, infra::Colour::white, region);
+            canvas.DrawFilledCircle(region.Centre(), 2, infra::Colour::black, region);
         }
 
         {
-            services::BitmapCanvas canvas(noteSnare, painter);
+            services::BitmapCanvas canvas(noteHiHat, painter);
             auto region = infra::Region(infra::Point(), canvas.Size());
             canvas.DrawFilledRectangle(region, infra::Colour::white, region);
-            canvas.DrawFilledCircle(infra::Point(1, 1), 1, infra::Colour::black, region);
+            canvas.DrawLine(infra::Point(0, 0), infra::Point(4, 4), infra::Colour::black, region);
+            canvas.DrawLine(infra::Point(0, 4), infra::Point(4, 0), infra::Colour::black, region);
         }
 
         {
             services::BitmapCanvas canvas(noteCymbal, painter);
             auto region = infra::Region(infra::Point(), canvas.Size());
             canvas.DrawFilledRectangle(region, infra::Colour::white, region);
-            canvas.DrawLine(infra::Point(0, 0), infra::Point(2, 2), infra::Colour::black, region);
-            canvas.DrawLine(infra::Point(0, 2), infra::Point(2, 0), infra::Colour::black, region);
+            canvas.DrawLine(infra::Point(0, 0), infra::Point(4, 4), infra::Colour::black, region);
+            canvas.DrawLine(infra::Point(0, 4), infra::Point(4, 0), infra::Colour::black, region);
+            canvas.DrawLine(infra::Point(0, 2), infra::Point(4, 2), infra::Colour::black, region);
         }
     }
 
@@ -51,7 +46,6 @@ namespace application
 
         for (const auto& note : notes)
             canvas.DrawBitmap(note.first, *note.second, boundingRegion);
-            //canvas.DrawFilledRectangle(note, infra::Colour::black, boundingRegion);
 
 #ifdef SHOW_PITCH
         if (lastPitch)
@@ -88,7 +82,7 @@ namespace application
 
             auto arc = 2 * pi / std::numeric_limits<uint16_t>::max() * note.moment - 2 * pi / 4;
             auto [distance, bitmap] = PitchToDistanceAndBitmap(note.pitch);
-            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5 + distance;
+            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 - 4 + distance;
 
             notes.emplace_back(infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre) - infra::Vector(2, 1), bitmap);
         }
@@ -108,29 +102,29 @@ namespace application
         switch (pitch)
         {
             case 36:        // Base
-                return std::make_pair(0, &noteBase);
+                return std::make_pair(0, &noteTom);
             case 43:        // Tom 3
-                return std::make_pair(4, &noteTom);
+                return std::make_pair(14, &noteTom);
             case 45:        // Tom 2
-                return std::make_pair(8, &noteTom);
-            case 48:        // Tom 1
                 return std::make_pair(12, &noteTom);
+            case 48:        // Tom 1
+                return std::make_pair(10, &noteTom);
             case 38:        // Snare
             case 40:        //       rim
-                return std::make_pair(16, &noteSnare);
+                return std::make_pair(8, &noteTom);
             case 46:        // Hi-hat bow
             case 26:        //        edge
-                return std::make_pair(20, &noteCymbal);
+                return std::make_pair(12, &noteHiHat);
             case 51:        // Ride edge
             case 59:        //      bow
             case 53:        //      bell
-                return std::make_pair(22, &noteCymbal);
+                return std::make_pair(14, &noteHiHat);
             case 49:        // Crash 1 bow
             case 55:        //         edge
-                return std::make_pair(24, &noteCymbal);
+                return std::make_pair(16, &noteCymbal);
             case 57:        // Crash 2 bow
             case 52:        //         edge
-                return std::make_pair(28, &noteCymbal);
+                return std::make_pair(18, &noteCymbal);
             default:
                 return std::make_pair(0, &noteCymbal);
         }

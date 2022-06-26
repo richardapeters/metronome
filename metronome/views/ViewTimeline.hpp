@@ -32,10 +32,9 @@ namespace application
         infra::BoundedVector<std::pair<infra::Point, infra::Point>>::WithMaxSize<16> lines;
         infra::BoundedVector<std::pair<infra::Point, const infra::Bitmap*>>::WithMaxSize<128> notes;
 
-        infra::Bitmap::Rgb565<5, 3> noteBase;
-        infra::Bitmap::Rgb565<3, 3> noteSnare;
-        infra::Bitmap::Rgb565<3, 3> noteTom;
-        infra::Bitmap::Rgb565<3, 3> noteCymbal;
+        infra::Bitmap::Rgb565<5, 5> noteTom;
+        infra::Bitmap::Rgb565<5, 5> noteHiHat;
+        infra::Bitmap::Rgb565<5, 5> noteCymbal;
 
 #ifdef SHOW_PITCH
         infra::Optional<uint8_t> lastPitch;
