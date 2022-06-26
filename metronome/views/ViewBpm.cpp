@@ -32,8 +32,7 @@ namespace application
 
         if (currentSprocket != nullptr)
             currentSprocket->Paint(canvas, boundingRegion);
-
-        if (backgroundColour == infra::Colour::white)
+        else if (backgroundColour == infra::Colour::white)
             timeline.Paint(canvas, boundingRegion);
     }
 

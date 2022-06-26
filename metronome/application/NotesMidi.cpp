@@ -29,6 +29,7 @@ namespace application
         auto endErase = (beatInMeasure + 1) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
 
         notes.erase(std::remove_if(notes.begin(), notes.end(), [startErase, endErase](auto note) { return note.moment >= startErase && note.moment <= endErase; }), notes.end());
+        infra::EventDispatcher::Instance().Schedule([this]() { GetObserver().NotesChanged(infra::MakeRange(notes)); });
     }
 
     void NotesMidi::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
