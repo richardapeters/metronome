@@ -35,7 +35,10 @@ namespace main_
         , lcdPins(tableLcd)
         , displayEnable(hal::Port::I, 12)
         , backlightEnable(hal::Port::K, 3)
-        , lcdBuffer(infra::Head(sdRam.Memory(), 2 * infra::Bitmap::BufferSize(hal::stm32f7discoveryLcdConfig.width, hal::stm32f7discoveryLcdConfig.height, hal::stm32f7discoveryLcdConfig.pixelFormat)))
-        , lcd(lcdPins, displayEnable, backlightEnable, lcdBuffer, hal::stm32f7discoveryLcdConfig)
+        , bufferSize(infra::Bitmap::BufferSize(hal::stm32f7discoveryLcdConfig.width, hal::stm32f7discoveryLcdConfig.height, hal::stm32f7discoveryLcdConfig.pixelFormat))
+        , lcdBuffer0(infra::Head(sdRam.Memory(), bufferSize))
+        , lcdBuffer1(infra::Head(infra::DiscardHead(sdRam.Memory(), bufferSize), bufferSize))
+        , lcdBuffer2(infra::Head(infra::DiscardHead(sdRam.Memory(), 2 * bufferSize), bufferSize))
+        , lcd(lcdPins, displayEnable, backlightEnable, lcdBuffer0, lcdBuffer1, hal::stm32f7discoveryLcdConfig)
     {}
 }

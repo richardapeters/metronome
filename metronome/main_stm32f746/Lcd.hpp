@@ -5,7 +5,6 @@
 #include "hal_st/stm32fxxx/SdRamStm.hpp"
 #include "preview/stm32fxxx/LcdStm.hpp"
 
-
 namespace main_
 {
     struct Lcd
@@ -18,8 +17,11 @@ namespace main_
         hal::MultiGpioPinStm lcdPins;
         hal::GpioPinStm displayEnable;
         hal::GpioPinStm backlightEnable;
-        infra::ByteRange lcdBuffer;
-        hal::LcdStm lcd;
+        uint32_t bufferSize;
+        infra::ByteRange lcdBuffer0;
+        infra::ByteRange lcdBuffer1;
+        infra::ByteRange lcdBuffer2;
+        hal::LcdStmDoubleBuffer lcd;
     };
 }
 
