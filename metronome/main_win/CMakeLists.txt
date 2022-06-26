@@ -10,6 +10,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL Windows)
     target_sources(metronome.main_win PRIVATE
         DoubleBufferDisplayAdaptedFromDirectDisplay.cpp
         DoubleBufferDisplayAdaptedFromDirectDisplay.hpp
+        MultiBufferDisplayAdaptedFromDirectDisplay.cpp
+        MultiBufferDisplayAdaptedFromDirectDisplay.hpp
         Main.cpp
     )
 
