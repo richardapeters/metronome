@@ -112,6 +112,7 @@ namespace application
             case 38:        // Snare
             case 40:        //       rim
                 return std::make_pair(8, &noteTom);
+            case 44:        // Hi-hat
             case 46:        // Hi-hat bow
             case 26:        //        edge
                 return std::make_pair(12, &noteHiHat);
