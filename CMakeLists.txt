@@ -10,21 +10,21 @@ include(FetchContent)
 FetchContent_Declare(
     emil
     GIT_REPOSITORY https://github.com/philips-software/embeddedinfralib.git
-    GIT_TAG        e50e7a11524b8d87aa5073183c642108b7ee081f
+    GIT_TAG        5085134881231c1010b076616c9674c0cead2218
     SOURCE_DIR     ${CMAKE_CURRENT_LIST_DIR}/Deps/emil
 )
 
 FetchContent_Declare(
     preview
     GIT_REPOSITORY https://github.com/philips-internal/amp-preview.git
-    GIT_TAG        932d60d79c25125f1b49e4752cae8594b721d18e
+    GIT_TAG        4185fe544fa739a1e8581a9ef93685563e2630ba
     SOURCE_DIR     ${CMAKE_CURRENT_LIST_DIR}/Deps/preview
 )
 
 FetchContent_Declare(
     halst
     GIT_REPOSITORY https://github.com/philips-internal/amp-hal-st.git
-    GIT_TAG        5618b6eae9851bcde91b0b664e832825a3e2c147
+    GIT_TAG        f925e313e9f154aedfb058ab5bde133c1e3022ed
     SOURCE_DIR     ${CMAKE_CURRENT_LIST_DIR}/Deps/halst
 )
 

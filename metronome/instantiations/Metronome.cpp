@@ -35,10 +35,12 @@ namespace application
 namespace main_
 {
     Metronome::Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer,
-        hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi)
+        hal::MultiBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi, infra::Bitmap& bitmap0, infra::Bitmap& bitmap1, infra::Bitmap& beatBitmap)
         : beatController(beatTimer)
         , notes(serialMidi, beatTimer)
-        , viewPainter(display, bitmapPainter, touch.GetView(), beatController)
+        , beatPainter(display, beatTimer, bitmapPainter, bitmap0, bitmap1, beatBitmap)
+        , viewPainter(beatPainter, bitmapPainter)
+        , repainter(viewPainter, touch.GetView())
         , viewBpm(beatController, notes, bitmapPainter)
         , viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
         , localTime(localTime)

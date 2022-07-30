@@ -1,3 +1,4 @@
+#include "infra/event/EventDispatcher.hpp"
 #include "metronome/main_win/MultiBufferDisplayAdaptedFromDirectDisplay.hpp"
 
 namespace services
@@ -10,6 +11,6 @@ namespace services
     {
         display.DrawBitmap(infra::Point(), bitmap, infra::Region(infra::Point(), display.Size()));
         display.PaintingComplete();
-        onDone();
+        infra::EventDispatcher::Instance().Schedule(onDone);
     }
 }

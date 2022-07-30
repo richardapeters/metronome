@@ -16,8 +16,6 @@ target_sources(metronome.views PRIVATE
     ViewDateEntry.hpp
     ViewNoteKind.cpp
     ViewNoteKind.hpp
-    ViewPainterMetronome.cpp
-    ViewPainterMetronome.hpp
     ViewSprocket.cpp
     ViewSprocket.hpp
     ViewStart.cpp

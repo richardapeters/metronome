@@ -20,6 +20,7 @@ namespace application
         valueFastDown.SetParent(*this);
         valueSlowUp.SetParent(*this);
         valueSlowDown.SetParent(*this);
+        timeline.SetParent(*this);
     }
 
     void ViewBpm::Paint(hal::Canvas& canvas, infra::Region boundingRegion)

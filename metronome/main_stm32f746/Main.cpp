@@ -149,7 +149,7 @@ int main()
     {
         static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
-        static main_::Metronome metronome(lcd.lcd.ViewingBitmap().size, rtc.rtc, beatTimer, lcd.lcd, bitmapPainter, midi);
+        static main_::Metronome metronome(lcd.lcd.DisplaySize(), rtc.rtc, beatTimer, lcd.lcd, bitmapPainter, midi, lcd.bitmap0, lcd.bitmap1, lcd.beatBitmap);
         static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
     });
 

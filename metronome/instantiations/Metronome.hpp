@@ -2,6 +2,7 @@
 #define METRONOME_METRONOME_HPP
 
 #include "metronome/application/BeatControllerImpl.hpp"
+#include "metronome/application/BeatPainter.hpp"
 #include "metronome/application/BpmSelectionInteractor.hpp"
 #include "metronome/application/Ds3231.hpp"
 #include "metronome/application/NotesMidi.hpp"
@@ -9,11 +10,12 @@
 #include "metronome/views/ViewBpm.hpp"
 #include "metronome/views/ViewDateEntry.hpp"
 #include "metronome/views/ViewNoteKind.hpp"
-#include "metronome/views/ViewPainterMetronome.hpp"
 #include "metronome/views/ViewStart.hpp"
 #include "metronome/views/ViewTapMeasurement.hpp"
 #include "preview/interfaces/DoubleBufferDisplay.hpp"
 #include "preview/interfaces/BitmapPainter.hpp"
+#include "preview/interfaces/ViewPainterDoubleBufferDisplay.hpp"
+#include "preview/interfaces/ViewRepainter.hpp"
 #include "preview/touch/TouchButton.hpp"
 #include "preview/touch/TouchHorizontalLayout.hpp"
 #include "preview/touch/TouchPanel.hpp"
@@ -55,7 +57,7 @@ namespace main_
     struct Metronome
     {
         Metronome(infra::Vector size, services::SettableTimerService& localTime, application::BeatTimer& beatTimer,
-            hal::DoubleBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi);
+            hal::MultiBufferDisplay& display, hal::BitmapPainter& bitmapPainter, hal::SerialCommunication& serialMidi, infra::Bitmap& bitmap0, infra::Bitmap& bitmap1, infra::Bitmap& beatBitmap);
 
         void StartTimeEntry();
         void StopTimeEntry(infra::TimePoint newTime);
@@ -63,7 +65,9 @@ namespace main_
         application::BeatControllerImpl beatController;
         application::NotesMidi notes;
         services::TouchViewMultiple::WithMaxViews<2> touch;
-        application::ViewPainterMetronome viewPainter;
+        application::BeatPainter beatPainter;
+        services::ViewPainterDoubleBufferDisplay viewPainter;
+        services::ViewRepainterPaintWhenDirty repainter;
         services::TouchHorizontalLayout::WithMaxViews<2> touchBpm;
         application::ViewBpm viewBpm;
         application::BpmSelectionInteractor bpmSelectionObserver{ viewBpm, beatController };

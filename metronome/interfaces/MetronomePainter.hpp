@@ -14,10 +14,8 @@ namespace application
     public:
         using infra::SingleObserver<MetronomePainter, MetronomePainterSubject>::SingleObserver;
 
-        virtual void StopAutomaticPainting() = 0;
-        virtual void StartAutomaticPainting() = 0;
-        virtual void ManualPaint() = 0;
-        virtual void SwapLayers(infra::Function<void()> onDone) = 0;
+        virtual void PaintBeatOn() = 0;
+        virtual void PaintBeatOff() = 0;
     };
 
     class MetronomePainterSubject

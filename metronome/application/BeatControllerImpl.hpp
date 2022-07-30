@@ -45,33 +45,11 @@ namespace application
             RunningState(BeatControllerImpl& controller);
 
             void Stop();
-            void Beat();
-
-        private:
-            void PrepareNextBeat();
-            void BeatOn();
-            void SwapLayers();
 
         private:
             BeatControllerImpl& controller;
 
-            infra::TimerSingleShot holdPaint;
-            infra::TimerSingleShot prepareBeat;
-            infra::TimerSingleShot beatOff;
-
-            enum class State
-            {
-                idle,
-                stoppedAutomaticPainting,
-                manuallyPainting,
-                readyForSwap,
-                swapping,
-                tooLateForSwapping
-            };
-
-            std::atomic<State> state{ State::manuallyPainting };
             bool stopRequested = false;
-            infra::TimePoint beat;
         };
 
     private:

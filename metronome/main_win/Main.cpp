@@ -1,7 +1,7 @@
 #include "hal/generic/TimerServiceGeneric.hpp"
 #include "infra/event/LowPowerEventDispatcher.hpp"
 #include "metronome/instantiations/Metronome.hpp"
-#include "metronome/main_win/DoubleBufferDisplayAdaptedFromDirectDisplay.hpp"
+#include "metronome/main_win/MultiBufferDisplayAdaptedFromDirectDisplay.hpp"
 #include "preview/sdl/DirectDisplaySdl.hpp"
 #include "preview/sdl/LowPowerStrategySdl.hpp"
 #include "preview/sdl/SdlTouchInteractor.hpp"
@@ -141,10 +141,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     hal::DirectDisplaySdl display(infra::Vector(480, 272));
 
     BeatTimerStub beatTimer;
-    services::DoubleBufferDisplayAdaptedFromDirectDisplay::WithStorage<480, 272, infra::PixelFormat::rgb565> displayAdapter(display);
+    services::MultiBufferDisplayAdaptedFromDirectDisplay displayAdapter(display);
     hal::BitmapPainterCanonical bitmapPainter;
     SerialCommunication8Beat serialMidi;
-    main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter, serialMidi);
+    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> bitmap0;
+    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> bitmap1;
+    infra::Bitmap::WithStorage<480, 272, infra::PixelFormat::rgb565> beatBitmap;
+    main_::Metronome metronome(display.Size(), localTime, beatTimer, displayAdapter, bitmapPainter, serialMidi, bitmap0, bitmap1, beatBitmap);
     services::SdlTouchInteractor touchInteractor(lowPowerStrategy, metronome.touch);
 
     eventDispatcher.Run();

@@ -21,7 +21,10 @@ namespace main_
         infra::ByteRange lcdBuffer0;
         infra::ByteRange lcdBuffer1;
         infra::ByteRange lcdBuffer2;
-        hal::LcdStmDoubleBuffer lcd;
+        infra::Bitmap bitmap0{ lcdBuffer0, infra::Vector(480, 272), infra::PixelFormat::rgb565 };
+        infra::Bitmap bitmap1{ lcdBuffer1, infra::Vector(480, 272), infra::PixelFormat::rgb565 };
+        infra::Bitmap beatBitmap{ lcdBuffer2, infra::Vector(480, 272), infra::PixelFormat::rgb565 };
+        hal::LcdStmMultiBuffer lcd;
     };
 }
 

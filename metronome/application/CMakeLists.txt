@@ -12,6 +12,8 @@ target_sources(metronome.application PRIVATE
     BpmSelectionInteractor.hpp
     Ds3231.cpp
     Ds3231.hpp
+    BeatPainter.cpp
+    BeatPainter.hpp
     NotesMidi.cpp
     NotesMidi.hpp
     StuckI2cReleaser.cpp
