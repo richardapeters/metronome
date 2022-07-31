@@ -17,7 +17,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     preview
     GIT_REPOSITORY https://github.com/philips-internal/amp-preview.git
-    GIT_TAG        4185fe544fa739a1e8581a9ef93685563e2630ba
+    GIT_TAG        bd39f1635fc01cb04036080561b099bb777b6da8
     SOURCE_DIR     ${CMAKE_CURRENT_LIST_DIR}/Deps/preview
 )
 

@@ -24,7 +24,6 @@ namespace application
     private:
         void ReceivedByte(uint8_t byte);
         uint16_t Now() const;
-        void AddNote(Note note);
 
     private:
         enum class State: uint8_t
@@ -33,8 +32,6 @@ namespace application
             receivedNoteOn,
             receivedPitch
         } state{ State::initial };
-
-        infra::BoundedVector<Note>::WithMaxSize<256> notes;
 
         infra::TimePoint beatStart;
         infra::Duration beatDuration;

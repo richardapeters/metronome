@@ -20,7 +20,7 @@ namespace application
     public:
         using infra::SingleObserver<NotesObserver, Notes>::SingleObserver;
 
-        virtual void NotesChanged(infra::MemoryRange<const Note> newNotes) = 0;
+        virtual void NoteAdded(Note newNote) = 0;
     };
 
     class Notes

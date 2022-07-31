@@ -27,9 +27,6 @@ namespace application
 
         auto startErase = beatInMeasure * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
         auto endErase = (beatInMeasure + 1) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
-
-        notes.erase(std::remove_if(notes.begin(), notes.end(), [startErase, endErase](auto note) { return note.moment >= startErase && note.moment <= endErase; }), notes.end());
-        infra::EventDispatcher::Instance().Schedule([this]() { GetObserver().NotesChanged(infra::MakeRange(notes)); });
     }
 
     void NotesMidi::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
@@ -44,8 +41,6 @@ namespace application
     void NotesMidi::Stopped()
     {
         running = false;
-        notes.clear();
-        GetObserver().NotesChanged(infra::MakeRange(notes));
     }
 
     void NotesMidi::ReceivedByte(uint8_t byte)
@@ -66,7 +61,7 @@ namespace application
                 infra::EventDispatcher::Instance().Schedule([this, note]()
                     {
                         if (running)
-                            AddNote(note);
+                            GetObserver().NoteAdded(note);
                     });
             }
             else if (state == State::receivedPitch)
@@ -77,15 +72,5 @@ namespace application
     uint16_t NotesMidi::Now() const
     {
         return ((infra::Now() - beatStart) + beatDuration * beatInMeasure) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure / beatDuration;
-    }
-
-    void NotesMidi::AddNote(Note note)
-    {
-        if (notes.full())
-            notes.erase(notes.begin());
-
-        notes.push_back(note);
-
-        GetObserver().NotesChanged(infra::MakeRange(notes));
     }
 }

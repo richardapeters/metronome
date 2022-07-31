@@ -1,3 +1,4 @@
+#include "infra/event/EventDispatcher.hpp"
 #include "infra/stream/StringOutputStream.hpp"
 #include "metronome/views/ViewTimeline.hpp"
 #include "preview/fonts/Fonts.hpp"
@@ -11,8 +12,9 @@ namespace application
         const auto pi = std::acos(-1);
     }
 
-    ViewTimeline::ViewTimeline(Notes& notes, hal::BitmapPainter& painter)
+    ViewTimeline::ViewTimeline(Notes& notes, hal::BitmapPainter& painter, BeatTimer& beatTimer)
         : NotesObserver(notes)
+        , BeatTimerObserver(beatTimer)
     {
         {
             services::BitmapCanvas canvas(noteTom, painter);
@@ -45,7 +47,7 @@ namespace application
             canvas.DrawLine(line.first, line.second, infra::Colour::darkGray, boundingRegion);
 
         for (const auto& note : notes)
-            canvas.DrawBitmap(note.first, *note.second, boundingRegion);
+            canvas.DrawBitmap(std::get<0>(note), *std::get<1>(note), boundingRegion);
 
 #ifdef SHOW_PITCH
         if (lastPitch)
@@ -71,21 +73,17 @@ namespace application
         }
     }
 
-    void ViewTimeline::NotesChanged(infra::MemoryRange<const Note> newNotes)
+    void ViewTimeline::NoteAdded(Note newNote)
     {
-        notes.clear();
+        if (notes.full())
+            notes.pop_front();
 
-        for (auto note : newNotes)
-        {
-            if (notes.full())
-                break;
+        auto arc = 2 * pi / std::numeric_limits<uint16_t>::max() * newNote.moment - 2 * pi / 4;
+        auto [distance, bitmap] = PitchToDistanceAndBitmap(newNote.pitch);
+        auto offsetFromCentre = ViewRegion().Size().deltaX / 3 - 4 + distance;
 
-            auto arc = 2 * pi / std::numeric_limits<uint16_t>::max() * note.moment - 2 * pi / 4;
-            auto [distance, bitmap] = PitchToDistanceAndBitmap(note.pitch);
-            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 - 4 + distance;
-
-            notes.emplace_back(infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre) - infra::Vector(2, 1), bitmap);
-        }
+        auto origin = infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre) - infra::Vector(2, 1);
+        notes.emplace_back(origin, bitmap, newNote.moment);
 
 #ifdef SHOW_PITCH
         if (newNotes.empty())
@@ -94,8 +92,44 @@ namespace application
             lastPitch = newNotes.back().pitch;
 #endif
 
+        Dirty(infra::Region(origin, bitmap->size));
+    }
+
+    void ViewTimeline::Beat()
+    {
+        infra::EventDispatcher::Instance().Schedule([this]()
+            {
+                infra::Region dirtyRegion;
+
+                auto start = std::numeric_limits<uint16_t>::max() / 4 * beatIndex;
+                auto end = std::numeric_limits<uint16_t>::max() / 4 * (beatIndex + 1);
+
+                auto i = notes.begin();
+                for (; i != notes.end(); ++i)
+                {
+                    if (std::get<2>(*i) < start || std::get<2>(*i) >= end)
+                        break;
+ 
+                    dirtyRegion = dirtyRegion | infra::Region(std::get<0>(*i), std::get<1>(*i)->size);
+                }
+
+                notes.erase(notes.begin(), i);
+
+                Dirty(dirtyRegion);
+
+                beatIndex = (beatIndex + 1) % 4;
+            });
+    }
+
+    void ViewTimeline::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
+    {
+        notes.clear();
+        beatIndex = 0;
         Dirty(ViewRegion());
     }
+
+    void ViewTimeline::Stopped()
+    {}
 
     std::pair<uint8_t, const infra::Bitmap*> ViewTimeline::PitchToDistanceAndBitmap(uint8_t pitch) const
     {
