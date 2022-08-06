@@ -101,8 +101,9 @@ namespace application
             {
                 infra::Region dirtyRegion;
 
-                auto start = std::numeric_limits<uint16_t>::max() / 4 * beatIndex;
-                auto end = std::numeric_limits<uint16_t>::max() / 4 * (beatIndex + 1);
+                auto period = (std::numeric_limits<uint16_t>::max() + 1) / 4;
+                auto start = period * beatIndex;
+                auto end = period * (beatIndex + 1);
 
                 auto i = notes.begin();
                 for (; i != notes.end(); ++i)
