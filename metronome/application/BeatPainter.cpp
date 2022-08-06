@@ -67,18 +67,17 @@ namespace application
         {
             if (!settingBitmap.test_and_set())
             {
+                beatOnOffRequested = false;
                 if (beatOn)
                     display.SetBitmap(beatBitmap, [this]()
                         {
                             settingBitmap.clear();
-                            beatOnOffRequested = false;
                             EvaluateSetBitmap();
                         });
                 else
                     display.SetBitmap(*viewingBitmap, [this]()
                         {
                             settingBitmap.clear();
-                            beatOnOffRequested = false;
                             if (onBeatOffDone)
                                 onBeatOffDone();
                             EvaluateSetBitmap();
