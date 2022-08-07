@@ -13,7 +13,6 @@ namespace application
 {
     class BeatControllerImpl
         : public BeatController
-        , public BeatTimerObserver
         , public MetronomePainterSubject
     {
     public:
@@ -28,11 +27,6 @@ namespace application
         virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) override;
         virtual void DisabledBeatsPerMinute() override;
         virtual void SelectedNoteKind(uint8_t noteKind) override;
-
-        // Implementation of BeatTimerObserver
-        virtual void Beat() override;
-        virtual void Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) override;
-        virtual void Stopped() override;
 
     private:
         void EvaluateRunningRequested();
@@ -53,6 +47,7 @@ namespace application
         };
 
     private:
+        BeatTimer& beatTimer;
         uint16_t bpm;
         infra::Optional<uint8_t> beatsPerMeasure;
         uint8_t noteKind = 0;

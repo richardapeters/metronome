@@ -5,7 +5,7 @@
 namespace application
 {
     BeatControllerImpl::BeatControllerImpl(BeatTimer& beatTimer)
-        : BeatTimerObserver(beatTimer)
+        : beatTimer(beatTimer)
     {}
 
     void BeatControllerImpl::SetBpm(uint16_t newBpm)
@@ -68,15 +68,6 @@ namespace application
             Start();
     }
 
-    void BeatControllerImpl::Beat()
-    {}
-
-    void BeatControllerImpl::Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
-    {}
-
-    void BeatControllerImpl::Stopped()
-    {}
-
     void BeatControllerImpl::EvaluateRunningRequested()
     {
         if (runningRequested && !runningState)
@@ -95,7 +86,7 @@ namespace application
     BeatControllerImpl::RunningState::RunningState(BeatControllerImpl& controller)
         : controller(controller)
     {
-        controller.BeatTimerObserver::Subject().Start(controller.bpm, controller.beatsPerMeasure, controller.noteKind);
+        controller.beatTimer.Start(controller.bpm, controller.beatsPerMeasure, controller.noteKind);
     }
 
     void BeatControllerImpl::RunningState::Stop()
@@ -103,7 +94,7 @@ namespace application
         if (stopRequested)
             return;
 
-        controller.BeatTimerObserver::Subject().Stop();
+        controller.beatTimer.Stop();
         controller.BeatController::GetObserver().BeatOff();
 
         stopRequested = true;
