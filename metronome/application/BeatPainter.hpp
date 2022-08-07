@@ -24,7 +24,7 @@ namespace application
         virtual const infra::Bitmap& ViewingBitmap() const override;
 
         // Implementation of BeatTimer
-        virtual void Beat() override;
+        virtual void Beat(uint8_t subDivision) override;
         virtual void Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) override;
         virtual void Stopped() override;
 

@@ -29,12 +29,13 @@ namespace application
         virtual void NoteAdded(Note newNote) override;
 
         // Implementation of BeatTimerObserver
-        virtual void Beat() override;
+        virtual void Beat(uint8_t subDivision) override;
         virtual void Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure) override;
         virtual void Stopped() override;
 
     private:
         std::pair<uint8_t, const infra::Bitmap*> PitchToDistanceAndBitmap(uint8_t pitch) const;
+        float ConvertArc(uint32_t position, uint32_t scale) const;
 
     private:
         infra::BoundedVector<std::pair<infra::Point, infra::Point>>::WithMaxSize<16> lines;
@@ -43,8 +44,11 @@ namespace application
         infra::Bitmap::Rgb565<5, 5> noteTom;
         infra::Bitmap::Rgb565<5, 5> noteHiHat;
         infra::Bitmap::Rgb565<5, 5> noteCymbal;
+        infra::Bitmap::Rgb565<5, 5> nowIndicator;
 
         uint8_t beatIndex = 0;
+
+        infra::Point nowIndicatorPosition;
 
 #ifdef SHOW_PITCH
         infra::Optional<uint8_t> lastPitch;

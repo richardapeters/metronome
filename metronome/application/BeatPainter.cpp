@@ -32,27 +32,30 @@ namespace application
         return *viewingBitmap;
     }
 
-    void BeatPainter::Beat()
+    void BeatPainter::Beat(uint8_t subDivision)
     {
         // Invoked on interrupt context
 
-        beatOn = true;
-        beatOnOffRequested = true;
-        EvaluateSetBitmap();
+        if (subDivision % 12 == 0)
+        {
+            beatOn = true;
+            beatOnOffRequested = true;
+            EvaluateSetBitmap();
 
-        infra::EventDispatcher::Instance().Schedule([this]()
-            {
-                beatOff.Start(std::chrono::milliseconds(30), [this]()
-                    {
-                        beatOn = false;
-                        beatOnOffRequested = true;
+            infra::EventDispatcher::Instance().Schedule([this]()
+                {
+                    beatOff.Start(std::chrono::milliseconds(30), [this]()
+                        {
+                            beatOn = false;
+                            beatOnOffRequested = true;
 
-                        if (onSwapDone != nullptr)
-                            onBeatOffDone = std::move(onSwapDone);
+                            if (onSwapDone != nullptr)
+                                onBeatOffDone = std::move(onSwapDone);
 
-                        EvaluateSetBitmap();
-                    });
-            });
+                            EvaluateSetBitmap();
+                        });
+                });
+        }
     }
 
     void BeatPainter::Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure)
@@ -77,9 +80,9 @@ namespace application
                 else
                     display.SetBitmap(*viewingBitmap, [this]()
                         {
-                            settingBitmap.clear();
                             if (onBeatOffDone)
                                 onBeatOffDone();
+                            settingBitmap.clear();
                             EvaluateSetBitmap();
                         });
             }
@@ -89,8 +92,8 @@ namespace application
             if (!settingBitmap.test_and_set())
                 display.SetBitmap(*viewingBitmap, [this]()
                     {
-                        settingBitmap.clear();
                         onSwapDone();
+                        settingBitmap.clear();
                         EvaluateSetBitmap();
                     });
         }

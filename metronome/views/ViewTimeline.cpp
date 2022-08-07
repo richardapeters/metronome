@@ -39,6 +39,13 @@ namespace application
             canvas.DrawLine(infra::Point(0, 4), infra::Point(4, 0), infra::Colour::black, region);
             canvas.DrawLine(infra::Point(0, 2), infra::Point(4, 2), infra::Colour::black, region);
         }
+
+        {
+            services::BitmapCanvas canvas(nowIndicator, painter);
+            auto region = infra::Region(infra::Point(), canvas.Size());
+            canvas.DrawFilledRectangle(region, infra::Colour::white, region);
+            canvas.DrawFilledCircle(region.Centre(), 2, infra::Colour::blue, region);
+        }
     }
 
     void ViewTimeline::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
@@ -47,7 +54,9 @@ namespace application
             canvas.DrawLine(line.first, line.second, infra::Colour::darkGray, boundingRegion);
 
         for (const auto& note : notes)
-            canvas.DrawBitmap(std::get<0>(note), *std::get<1>(note), boundingRegion);
+            canvas.DrawTransparentBitmap(std::get<0>(note), *std::get<1>(note), infra::ConvertRgb888To(infra::Colour::white, std::get<1>(note)->pixelFormat), boundingRegion);
+
+        canvas.DrawTransparentBitmap(nowIndicatorPosition, nowIndicator, infra::ConvertRgb888To(infra::Colour::white, nowIndicator.pixelFormat), boundingRegion);
 
 #ifdef SHOW_PITCH
         if (lastPitch)
@@ -67,7 +76,7 @@ namespace application
         {
             auto position = lines.size();
             auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5;
-            auto arc = 2 * pi * position / lines.max_size() + 2 * pi / 4;
+            auto arc = ConvertArc(position, lines.max_size());
 
             lines.push_back({ infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre), infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre + 10 - 8 * (position % 2)) });
         }
@@ -78,7 +87,7 @@ namespace application
         if (notes.full())
             notes.pop_front();
 
-        auto arc = 2 * pi / std::numeric_limits<uint16_t>::max() * newNote.moment - 2 * pi / 4;
+        auto arc = ConvertArc(newNote.moment, std::numeric_limits<uint16_t>::max() + 1);
         auto [distance, bitmap] = PitchToDistanceAndBitmap(newNote.pitch);
         auto offsetFromCentre = ViewRegion().Size().deltaX / 3 - 4 + distance;
 
@@ -95,37 +104,53 @@ namespace application
         Dirty(infra::Region(origin, bitmap->size));
     }
 
-    void ViewTimeline::Beat()
+    void ViewTimeline::Beat(uint8_t subDivision)
     {
-        infra::EventDispatcher::Instance().Schedule([this]()
-            {
-                infra::Region dirtyRegion;
-
-                auto period = (std::numeric_limits<uint16_t>::max() + 1) / 4;
-                auto start = period * beatIndex;
-                auto end = period * (beatIndex + 1);
-
-                auto i = notes.begin();
-                for (; i != notes.end(); ++i)
+        if (subDivision % 3 == 0)
+            infra::EventDispatcher::Instance().Schedule([this, subDivision]()
                 {
-                    if (std::get<2>(*i) < start || std::get<2>(*i) >= end)
-                        break;
+                    infra::Region dirtyRegion;
+
+                    auto period = (std::numeric_limits<uint16_t>::max() + 1) / 4 / 4;
+                    auto start = period * (beatIndex * 4 + subDivision / 3);
+                    auto end = start + period;
+
+                    auto i = notes.begin();
+                    for (; i != notes.end(); ++i)
+                    {
+                        if (std::get<2>(*i) < start || std::get<2>(*i) >= end)
+                            break;
  
-                    dirtyRegion = dirtyRegion | infra::Region(std::get<0>(*i), std::get<1>(*i)->size);
-                }
+                        dirtyRegion = dirtyRegion | infra::Region(std::get<0>(*i), std::get<1>(*i)->size);
+                    }
 
-                notes.erase(notes.begin(), i);
+                    notes.erase(notes.begin(), i);
 
-                Dirty(dirtyRegion);
+                    dirtyRegion = dirtyRegion | infra::Region(nowIndicatorPosition, nowIndicator.size);
+                    auto arc = ConvertArc(beatIndex * 4 + subDivision / 3, 16);
+                    nowIndicatorPosition = infra::RotatedPoint(ViewRegion().Centre(), arc, ViewRegion().Size().deltaX / 3) - infra::Vector(2, 1);
+                    dirtyRegion = dirtyRegion | infra::Region(nowIndicatorPosition, nowIndicator.size);
 
-                beatIndex = (beatIndex + 1) % 4;
-            });
+                    Dirty(dirtyRegion);
+
+                    if (subDivision == 9)
+                        beatIndex = (beatIndex + 1) % 4;
+                });
+    }
+
+    float ViewTimeline::ConvertArc(uint32_t position, uint32_t scale) const
+    {
+        return 2 * pi / scale * position - 2 * pi / 4;
     }
 
     void ViewTimeline::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
     {
         notes.clear();
         beatIndex = 0;
+
+        auto arc = ConvertArc(0, 16);
+        nowIndicatorPosition = infra::RotatedPoint(ViewRegion().Centre(), arc, ViewRegion().Size().deltaX / 3) - infra::Vector(2, 1);
+
         Dirty(ViewRegion());
     }
 

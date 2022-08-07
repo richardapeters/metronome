@@ -74,14 +74,17 @@ public:
 
 private:
     infra::TimerRepeating timer;
+    uint8_t subDivision = 0;
 };
 
 void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind)
 {
+    subDivision = 0;
     NotifyObservers([bpm, beatsPerMeasure](auto& observer) { observer.Started(bpm, beatsPerMeasure); });
-    timer.Start(std::chrono::microseconds(60000000 / bpm), [this]()
+    timer.Start(std::chrono::microseconds(60000000 / bpm / 12), [this]()
         {
-            NotifyObservers([](auto& observer) { observer.Beat(); });
+            NotifyObservers([this](auto& observer) { observer.Beat(subDivision); });
+            subDivision = (subDivision + 1) % 12;
         }, infra::triggerImmediately);
 }
 

@@ -15,18 +15,18 @@ namespace application
             });
     }
 
-    void NotesMidi::Beat()
+    void NotesMidi::Beat(uint8_t subDivision)
     {
-        auto newBeatStart = infra::Now();
-        beatDuration = newBeatStart - beatStart;
-        beatStart = newBeatStart;
+        if (subDivision == 0)
+        {
+            auto newBeatStart = infra::Now();
+            beatDuration = newBeatStart - beatStart;
+            beatStart = newBeatStart;
 
-        ++beatInMeasure;
-        if (beatInMeasure == beatsPerMeasure)
-            beatInMeasure = 0;
-
-        auto startErase = beatInMeasure * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
-        auto endErase = (beatInMeasure + 1) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure;
+            ++beatInMeasure;
+            if (beatInMeasure == beatsPerMeasure)
+                beatInMeasure = 0;
+        }
     }
 
     void NotesMidi::Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure)
@@ -71,6 +71,6 @@ namespace application
 
     uint16_t NotesMidi::Now() const
     {
-        return ((infra::Now() - beatStart) + beatDuration * beatInMeasure) * std::numeric_limits<uint16_t>::max() / beatsPerMeasure / beatDuration;
+        return ((infra::Now() - beatStart) + beatDuration * beatInMeasure) * (std::numeric_limits<uint16_t>::max() + 1) / beatsPerMeasure / beatDuration;
     }
 }
