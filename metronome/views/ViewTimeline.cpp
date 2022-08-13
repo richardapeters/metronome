@@ -100,10 +100,8 @@ namespace application
         notes.emplace_back(origin, bitmap, newNote.moment);
 
 #ifdef SHOW_PITCH
-        if (newNotes.empty())
-            lastPitch = infra::none;
-        else
-            lastPitch = newNotes.back().pitch;
+        lastPitch = newNote.pitch;
+        Dirty(ViewRegion());
 #endif
 
         Dirty(infra::Region(origin, bitmap->size));
@@ -177,9 +175,11 @@ namespace application
             case 38:        // Snare
             case 40:        //       rim
                 return std::make_pair(8, &noteTom);
-            case 44:        // Hi-hat
-            case 46:        // Hi-hat bow
+            case 42:        // Hi-hat closed
+            case 44:        // Hi-hat foot
+            case 46:        // Hi-hat open
             case 26:        //        edge
+            case 22:        //        ...
                 return std::make_pair(12, &noteHiHat);
             case 51:        // Ride edge
             case 59:        //      bow
