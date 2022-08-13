@@ -29,19 +29,22 @@ namespace application
     {
         Stop();
 
-        runningRequested = true;
-        EvaluateRunningRequested();
+        beatTimer.Start(bpm, beatsPerMeasure, noteKind);
+        running = true;
     }
 
     void BeatControllerImpl::Stop()
     {
         if (Running())
-            runningState->Stop();
+        {
+            beatTimer.Stop();
+            running = false;
+        }
     }
 
     bool BeatControllerImpl::Running() const
     {
-        return runningState != infra::none;
+        return running;
     }
 
     void BeatControllerImpl::SelectedBeatsPerMeasure(uint8_t beatsPerMeasure)
@@ -66,39 +69,5 @@ namespace application
 
         if (Running())
             Start();
-    }
-
-    void BeatControllerImpl::EvaluateRunningRequested()
-    {
-        if (runningRequested && !runningState)
-        {
-            runningRequested = false;
-            runningState.Emplace(*this);
-        }
-    }
-
-    void BeatControllerImpl::RunningStopped()
-    {
-        runningState = infra::none;
-        EvaluateRunningRequested();
-    }
-
-    BeatControllerImpl::RunningState::RunningState(BeatControllerImpl& controller)
-        : controller(controller)
-    {
-        controller.beatTimer.Start(controller.bpm, controller.beatsPerMeasure, controller.noteKind);
-    }
-
-    void BeatControllerImpl::RunningState::Stop()
-    {
-        if (stopRequested)
-            return;
-
-        controller.beatTimer.Stop();
-        controller.BeatController::GetObserver().BeatOff();
-
-        stopRequested = true;
-
-        controller.RunningStopped();
     }
 }

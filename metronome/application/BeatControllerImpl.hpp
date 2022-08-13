@@ -29,33 +29,13 @@ namespace application
         virtual void SelectedNoteKind(uint8_t noteKind) override;
 
     private:
-        void EvaluateRunningRequested();
-        void RunningStopped();
-
-    private:
-        class RunningState
-        {
-        public:
-            RunningState(BeatControllerImpl& controller);
-
-            void Stop();
-
-        private:
-            BeatControllerImpl& controller;
-
-            bool stopRequested = false;
-        };
-
-    private:
         BeatTimer& beatTimer;
         uint16_t bpm;
         infra::Optional<uint8_t> beatsPerMeasure;
         uint8_t noteKind = 0;
+        bool running = false;
 
         infra::Duration expectedPaintDuration = std::chrono::milliseconds(120);
-
-        infra::Optional<RunningState> runningState;
-        bool runningRequested = false;
     };
 }
 

@@ -39,18 +39,30 @@ namespace application
         if (subDivision % 12 == 0)
         {
             beatOn = true;
-            beatOnOffRequested = true;
-            EvaluateSetBitmap();
+
+            if (!settingBitmap.test_and_set())
+            {
+                display.SetBitmap(beatBitmap, [this]()
+                    {
+                        settingBitmap.clear();
+                        EvaluateSetBitmap();
+                    });
+            }
+            else
+                beatOnOffRequested = true;
 
             infra::EventDispatcher::Instance().Schedule([this]()
                 {
                     beatOff.Start(std::chrono::milliseconds(30), [this]()
                         {
+                            if (!settingBitmap.test_and_set() && onSwapDone != nullptr)
+                            {
+                                onBeatOffDone = std::move(onSwapDone);
+                                settingBitmap.clear();
+                            }
+
                             beatOn = false;
                             beatOnOffRequested = true;
-
-                            if (onSwapDone != nullptr)
-                                onBeatOffDone = std::move(onSwapDone);
 
                             EvaluateSetBitmap();
                         });

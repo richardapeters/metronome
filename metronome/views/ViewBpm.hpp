@@ -14,7 +14,6 @@ namespace application
         : public services::View
         , public services::TouchRecipient
         , public BpmSelection
-        , public BeatControllerObserver
     {
     public:
         ViewBpm(BeatController& controller, Notes& notes, hal::BitmapPainter& painter, BeatTimer& beatTimer);
@@ -35,14 +34,12 @@ namespace application
         // Implementation of BpmSelection
         virtual void SetBpm(uint16_t bpm) override;
 
-        // Implementation of BeatControllerObserver
-        virtual void BeatOn() override;
-        virtual void BeatOff() override;
-
     private:
         void Select(uint16_t value);
 
     private:
+        BeatController& controller;
+
         infra::BoundedString::WithStorage<4> bpmString;
         uint16_t bpm;
         infra::Colour backgroundColour = infra::Colour::white;

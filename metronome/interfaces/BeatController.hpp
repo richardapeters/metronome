@@ -6,20 +6,7 @@
 
 namespace application
 {
-    class BeatController;
-
-    class BeatControllerObserver
-        : public infra::SingleObserver<BeatControllerObserver, BeatController>
-    {
-    public:
-        using infra::SingleObserver<BeatControllerObserver, BeatController>::SingleObserver;
-
-        virtual void BeatOn() = 0;
-        virtual void BeatOff() = 0;
-    };
-
     class BeatController
-        : public infra::Subject<BeatControllerObserver>
     {
     public:
         virtual void SetBpm(uint16_t newBpm) = 0;

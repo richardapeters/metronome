@@ -140,13 +140,13 @@ int main()
 
     static infra::MemoryRange<const int16_t> softClick = CreateSoftClick(click);
 
-    static hal::GpioPinStm midiRx(hal::Port::C, 7);
-    static hal::UartStm::Config config;
-    config.baudrate = 31250;
-    static hal::UartStm midi(dma, 6, hal::dummyPinStm, midiRx, config);
-
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
     {
+        static hal::GpioPinStm midiRx(hal::Port::C, 7);
+        static hal::UartStm::Config config;
+        config.baudrate = 31250;
+        static hal::UartStm midi(dma, 6, hal::dummyPinStm, midiRx, config);
+
         static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.DisplaySize(), rtc.rtc, beatTimer, lcd.lcd, bitmapPainter, midi, lcd.bitmap0, lcd.bitmap1, lcd.beatBitmap);

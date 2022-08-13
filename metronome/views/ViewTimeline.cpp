@@ -53,6 +53,8 @@ namespace application
         for (const auto& line : lines)
             canvas.DrawLine(line.first, line.second, infra::Colour::darkGray, boundingRegion);
 
+        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 2, ViewRegion().Size().deltaX / 3 + 2, infra::Colour::red, boundingRegion);
+
         for (const auto& note : notes)
             canvas.DrawTransparentBitmap(std::get<0>(note), *std::get<1>(note), infra::ConvertRgb888To(infra::Colour::white, std::get<1>(note)->pixelFormat), boundingRegion);
 
@@ -75,10 +77,13 @@ namespace application
         while (!lines.full())
         {
             auto position = lines.size();
-            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 + 5;
+            auto offsetFromCentre = ViewRegion().Size().deltaX / 3 - 5;
             auto arc = ConvertArc(position, lines.max_size());
 
-            lines.push_back({ infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre), infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre + 10 - 8 * (position % 2)) });
+            auto lineStart = infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre);
+            auto lineEnd = infra::RotatedPoint(ViewRegion().Centre(), arc, offsetFromCentre + 20 - 8 * (position % 2));
+
+            lines.push_back({ lineStart, lineEnd });
         }
     }
 

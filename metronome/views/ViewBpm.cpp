@@ -7,7 +7,7 @@ namespace application
     const std::array<uint16_t, 8> ViewBpm::selectValues = { { 80, 90, 100, 120, 140, 160, 60, 70 } };
 
     ViewBpm::ViewBpm(BeatController& controller, Notes& notes, hal::BitmapPainter& painter, BeatTimer& beatTimer)
-        : BeatControllerObserver(controller)
+        : controller(controller)
         , valueSelect(selectValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastUp(fastUpValues, [this](uint16_t value) { Select(value); }, 0)
         , valueFastDown(fastDownValues, [this](uint16_t value) { Select(value); }, 0)
@@ -25,16 +25,14 @@ namespace application
 
     void ViewBpm::Paint(hal::Canvas& canvas, infra::Region boundingRegion)
     {
-        canvas.DrawFilledRectangle(ViewRegion(), backgroundColour, boundingRegion);
-        canvas.DrawCircle(ViewRegion().Centre(), ViewRegion().Size().deltaX / 3 - 2, ViewRegion().Size().deltaX / 3 + 2, infra::Colour::red, boundingRegion);
+        canvas.DrawFilledRectangle(ViewRegion(), infra::Colour::white, boundingRegion);
 
         auto& font = infra::freeSans24pt7b;
         canvas.DrawString(ViewRegion().Centre() + infra::Vector(-font.Width(bpmString) / 2, font.cursorToTop / 2), bpmString, font, infra::Colour::blue, infra::RightAngle::angle_0, boundingRegion);
 
+        timeline.Paint(canvas, boundingRegion);
         if (currentSprocket != nullptr)
             currentSprocket->Paint(canvas, boundingRegion);
-        else if (backgroundColour == infra::Colour::white)
-            timeline.Paint(canvas, boundingRegion);
     }
 
     void ViewBpm::ViewRegionChanged()
@@ -72,7 +70,7 @@ namespace application
                     fastUpValues[1] = bpm + 5;
 
                     for (int i = 0; i != fastUpValues.size(); ++i)
-                        if (!BeatControllerObserver::Subject().BpmIsValid(fastUpValues[i]))
+                        if (!controller.BpmIsValid(fastUpValues[i]))
                             fastUpValues[i] = 0;
                 }
                 else
@@ -84,7 +82,7 @@ namespace application
                     fastDownValues[1] = bpm - 5;
 
                     for (int i = 0; i != fastDownValues.size(); ++i)
-                        if (!BeatControllerObserver::Subject().BpmIsValid(fastDownValues[i]))
+                        if (!controller.BpmIsValid(fastDownValues[i]))
                             fastDownValues[i] = 0;
                 }
             }
@@ -98,7 +96,7 @@ namespace application
                     for (int i = 1; i != slowDownValues.size(); ++i)
                     {
                         slowDownValues[i] = bpm - i;
-                        if (!BeatControllerObserver::Subject().BpmIsValid(slowDownValues[i]))
+                        if (!controller.BpmIsValid(slowDownValues[i]))
                             slowDownValues[i] = 0;
                     }
                 }
@@ -110,7 +108,7 @@ namespace application
                     for (int i = 1; i != slowUpValues.size(); ++i)
                     {
                         slowUpValues[i] = bpm + i;
-                        if (!BeatControllerObserver::Subject().BpmIsValid(slowUpValues[i]))
+                        if (!controller.BpmIsValid(slowUpValues[i]))
                             slowUpValues[i] = 0;
                     }
                 }
@@ -167,18 +165,6 @@ namespace application
         stream << newBpm;
         bpm = newBpm;
 
-        Dirty(ViewRegion());
-    }
-
-    void ViewBpm::BeatOn()
-    {
-        backgroundColour = infra::Colour::red;
-        Dirty(ViewRegion());
-    }
-
-    void ViewBpm::BeatOff()
-    {
-        backgroundColour = infra::Colour::white;
         Dirty(ViewRegion());
     }
 

@@ -40,22 +40,21 @@ namespace application
     {
         if (beatsPerMeasure != infra::none && currentBeat == 0)
             sai.Transfer(dataAccent);
-        else if (currentBeat % subSteps[noteKind] == 0)
+        else if (currentBeat % 12 == 0)
         {
-            if (currentBeat % superSteps[noteKind] == 0)
+            if (currentBeat % (12 * superSteps[noteKind]) == 0)
                 sai.Transfer(data);
         }
-        else
+        else if (currentBeat % (12 / subSteps[noteKind]) == 0)
             sai.Transfer(dataSub);
 
         SetNextReload();
         hal::LowPowerTimer::Reload();
 
-        if (currentBeat % subSteps[noteKind] == 0)
-            NotifyObservers([](auto& observer) { observer.Beat(); });
+        NotifyObservers([this](auto& observer) { observer.Beat(currentBeat % 12); });
 
         ++currentBeat;
-        if (currentBeat == beatsPerMeasure.ValueOr(1) * subSteps[noteKind])
+        if (currentBeat == beatsPerMeasure.ValueOr(1) * 12)
             currentBeat = 0;
     }
 
@@ -64,7 +63,7 @@ namespace application
         if (amount == 0)
         {
             total = 32768 * 60;
-            step = std::min<uint32_t>(total / bpm / subSteps[noteKind], 65535);
+            step = std::min<uint32_t>(total / bpm / 12, 65535);
             amount = total / step;
             cumulative = 0;
         }
