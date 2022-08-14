@@ -42,8 +42,8 @@
         "emil_DIR": "${sourceDir}/build/windows/_deps/emil-build/cmake",
         "EMIL_GENERATE_PACKAGE_CONFIG": false,
         "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
-        "TARGET_MCU": "STM32F746",
-        "TARGET_MCU_FAMILY": "STM32F7xx",
+        "TARGET_MCU": "stm32f746",
+        "TARGET_MCU_FAMILY": "stm32f7xx",
         "TARGET_BUILD_CORTEX": true
       }
     }
@@ -60,11 +60,6 @@
       "configurePreset": "windows"
     },
     {
-      "name": "windows-MinSizeRel",
-      "configuration": "MinSizeRel",
-      "configurePreset": "windows"
-    },
-    {
       "name": "STM32F746-Debug",
       "configuration": "Debug",
       "configurePreset": "stm32f746"
@@ -72,11 +67,6 @@
     {
       "name": "STM32F746-RelWithDebInfo",
       "configuration": "RelWithDebInfo",
-      "configurePreset": "stm32f746"
-    },
-    {
-      "name": "STM32F746-MinSizeRel",
-      "configuration": "MinSizeRel",
       "configurePreset": "stm32f746"
     }
   ],
