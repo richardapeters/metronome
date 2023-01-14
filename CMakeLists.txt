@@ -15,3 +15,6 @@ add_subdirectory(HalSt)
 
 add_subdirectory(local_hal)
 add_subdirectory(metronome)
+
+emil_folderize_all_targets()
+emil_generate_antora_docs_target(antora-playbook.yml)
