@@ -5,8 +5,8 @@
 #include "metronome/interfaces/BpmSelection.hpp"
 #include "metronome/views/ViewSprocket.hpp"
 #include "metronome/views/ViewTimeline.hpp"
-#include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
+#include "preview/touch/TouchRecipient.hpp"
 
 namespace application
 {

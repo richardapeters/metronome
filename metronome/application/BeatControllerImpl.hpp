@@ -1,9 +1,9 @@
 #ifndef METRONOME_BEAT_CONTROLLER_IMPL_HPP
 #define METRONOME_BEAT_CONTROLLER_IMPL_HPP
 
+#include "infra/timer/Timer.hpp"
 #include "infra/util/Observer.hpp"
 #include "infra/util/Optional.hpp"
-#include "infra/timer/Timer.hpp"
 #include "metronome/interfaces/BeatController.hpp"
 #include "metronome/interfaces/BeatTimer.hpp"
 #include "metronome/interfaces/MetronomePainter.hpp"

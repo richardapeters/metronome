@@ -11,8 +11,11 @@
 
 namespace hal
 {
-    struct SaiA {};
-    struct SaiB {};
+    struct SaiA
+    {};
+
+    struct SaiB
+    {};
 
     extern SaiA saiA;
     extern SaiB saiB;

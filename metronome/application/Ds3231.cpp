@@ -1,6 +1,6 @@
+#include "metronome/application/Ds3231.hpp"
 #include "infra/timer/PartitionedTime.hpp"
 #include "infra/util/BitLogic.hpp"
-#include "metronome/application/Ds3231.hpp"
 
 namespace services
 {
@@ -26,12 +26,8 @@ namespace services
         onReadDone = onDone;
 
         i2c.SendData(address, infra::MakeByteRange(addressStart), hal::Action::repeatedStart, [this](hal::Result, uint32_t numberOfBytesSent)
-        {
-            i2c.ReceiveData(address, infra::MakeByteRange(timeData), hal::Action::stop, [this](hal::Result)
-            {
-                onReadDone(Convert(timeData));
-            });
-        });
+            { i2c.ReceiveData(address, infra::MakeByteRange(timeData), hal::Action::stop, [this](hal::Result)
+                  { onReadDone(Convert(timeData)); }); });
     }
 
     void Ds3231::SetTime(infra::TimePoint time, const infra::Function<void(infra::TimePoint)>& onDone)
@@ -40,36 +36,23 @@ namespace services
         timeData = Convert(time);
 
         i2c.SendData(address, infra::MakeByteRange(addressStart), hal::Action::continueSession, [this](hal::Result, uint32_t numberOfBytesSent)
-        {
-            i2c.SendData(address, infra::MakeByteRange(timeData), hal::Action::stop, [this](hal::Result, uint32_t numberOfBytesSent)
-            {
-                i2c.SendData(address, infra::MakeByteRange(addressStatus), hal::Action::continueSession, [this](hal::Result, uint32_t numberOfBytesSent)
-                {
-                    i2c.SendData(address, infra::MakeByteRange(resetOscillatorStopFlag), hal::Action::stop, [this](hal::Result, uint32_t numberOfBytesSent)
-                    {
-                        onSetDone(Convert(timeData));
-                    });
-                });
-            });
-        });
+            { i2c.SendData(address, infra::MakeByteRange(timeData), hal::Action::stop, [this](hal::Result, uint32_t numberOfBytesSent)
+                  { i2c.SendData(address, infra::MakeByteRange(addressStatus), hal::Action::continueSession, [this](hal::Result, uint32_t numberOfBytesSent)
+                        { i2c.SendData(address, infra::MakeByteRange(resetOscillatorStopFlag), hal::Action::stop, [this](hal::Result, uint32_t numberOfBytesSent)
+                              { onSetDone(Convert(timeData)); }); }); }); });
     }
 
     void Ds3231::Initialize()
     {
         static const std::array<uint8_t, 2> init{ addressControl, 0x00 };
         i2c.SendData(address, init, hal::Action::stop, [this](hal::Result, uint32_t numberOfBytesSent)
-        {
-            i2c.SendData(address, infra::MakeByteRange(addressStatus), hal::Action::repeatedStart, [this](hal::Result, uint32_t numberOfBytesSent)
-            {
-                i2c.ReceiveData(address, infra::MakeByteRange(status), hal::Action::stop, [this](hal::Result)
-                {
+            { i2c.SendData(address, infra::MakeByteRange(addressStatus), hal::Action::repeatedStart, [this](hal::Result, uint32_t numberOfBytesSent)
+                  { i2c.ReceiveData(address, infra::MakeByteRange(status), hal::Action::stop, [this](hal::Result)
+                        {
                     if (infra::IsBitSet(status, 7))
                         onInitialized(infra::none);
                     else
-                        ReadTime([this](infra::TimePoint time) { onInitialized(infra::MakeOptional(time)); });
-                });
-            });
-        });
+                        ReadTime([this](infra::TimePoint time) { onInitialized(infra::MakeOptional(time)); }); }); }); });
     }
 
     infra::TimePoint Ds3231::Convert(TimeData data) const
@@ -104,7 +87,8 @@ namespace services
 
     Ds3231TimerService::Ds3231TimerService(hal::I2cMaster& i2c, hal::GpioPin& interrupt, uint32_t id)
         : SettableTimerService(id)
-        , rtc(i2c, [this](infra::Optional<infra::TimePoint> newTime) { OnInitialized(newTime); })
+        , rtc(i2c, [this](infra::Optional<infra::TimePoint> newTime)
+              { OnInitialized(newTime); })
         , interrupt(interrupt)
     {}
 
@@ -112,13 +96,12 @@ namespace services
     {
         onSetDone = onDone;
         rtc.SetTime(newTime, [this](infra::TimePoint newTime)
-        {
+            {
             auto oldTime = *time;
             time = newTime;
             EnableInterrupt();
             onSetDone();
-            Jumped(oldTime, newTime);
-        });
+            Jumped(oldTime, newTime); });
     }
 
     infra::TimePoint Ds3231TimerService::Now() const
@@ -146,7 +129,9 @@ namespace services
     void Ds3231TimerService::EnableInterrupt()
     {
         if (!interruptEnabled)
-            interrupt.EnableInterrupt([this]() { SecondElapsed(); }, hal::InterruptTrigger::risingEdge);
+            interrupt.EnableInterrupt([this]()
+                { SecondElapsed(); },
+                hal::InterruptTrigger::risingEdge);
         interruptEnabled = true;
     }
 

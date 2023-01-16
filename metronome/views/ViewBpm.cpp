@@ -1,5 +1,5 @@
-#include "infra/stream/StringOutputStream.hpp"
 #include "metronome/views/ViewBpm.hpp"
+#include "infra/stream/StringOutputStream.hpp"
 #include "preview/fonts/Fonts.hpp"
 
 namespace application
@@ -8,11 +8,26 @@ namespace application
 
     ViewBpm::ViewBpm(BeatController& controller, Notes& notes, hal::BitmapPainter& painter, BeatTimer& beatTimer)
         : controller(controller)
-        , valueSelect(selectValues, [this](uint16_t value) { Select(value); }, 0)
-        , valueFastUp(fastUpValues, [this](uint16_t value) { Select(value); }, 0)
-        , valueFastDown(fastDownValues, [this](uint16_t value) { Select(value); }, 0)
-        , valueSlowUp(slowUpValues, [this](uint16_t value) { Select(value); }, 1)
-        , valueSlowDown(slowDownValues, [this](uint16_t value) { Select(value); }, 3)
+        , valueSelect(
+              selectValues, [this](uint16_t value)
+              { Select(value); },
+              0)
+        , valueFastUp(
+              fastUpValues, [this](uint16_t value)
+              { Select(value); },
+              0)
+        , valueFastDown(
+              fastDownValues, [this](uint16_t value)
+              { Select(value); },
+              0)
+        , valueSlowUp(
+              slowUpValues, [this](uint16_t value)
+              { Select(value); },
+              1)
+        , valueSlowDown(
+              slowDownValues, [this](uint16_t value)
+              { Select(value); },
+              3)
         , timeline(notes, painter, beatTimer)
     {
         valueSelect.SetParent(*this);
@@ -170,6 +185,7 @@ namespace application
 
     void ViewBpm::Select(uint16_t value)
     {
-        NotifyObservers([value](BpmSelectionObserver& observer) { observer.BpmSelected(value); });
+        NotifyObservers([value](BpmSelectionObserver& observer)
+            { observer.BpmSelected(value); });
     }
 }

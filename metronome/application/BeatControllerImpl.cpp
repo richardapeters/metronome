@@ -1,5 +1,5 @@
-#include "infra/event/EventDispatcher.hpp"
 #include "metronome/application/BeatControllerImpl.hpp"
+#include "infra/event/EventDispatcher.hpp"
 #include "services/tracer/GlobalTracer.hpp"
 
 namespace application

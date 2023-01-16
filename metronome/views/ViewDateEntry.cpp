@@ -1,5 +1,5 @@
-#include "infra/timer/PartitionedTime.hpp"
 #include "metronome/views/ViewDateEntry.hpp"
+#include "infra/timer/PartitionedTime.hpp"
 
 namespace application
 {
@@ -8,7 +8,9 @@ namespace application
         , hours(0, 0, 23, true, 30, 2, services::FadingTextAttributes{ infra::Colour::blue, infra::Colour::gray, infra::freeSans24pt7b })
         , minutesTen(0, 0, 5, true, 30, services::FadingTextAttributes{ infra::Colour::blue, infra::Colour::gray, infra::freeSans24pt7b })
         , minutesOne(0, 0, 9, true, 30, services::FadingTextAttributes{ infra::Colour::blue, infra::Colour::gray, infra::freeSans24pt7b })
-        , ok([this]() { OnOk(); }, services::FramedTextButtonAttributes{ infra::Colour::darkGray, infra::Colour::gray, infra::Colour::darkGray, infra::Colour::white, infra::freeSans12pt7b }, "OK")
+        , ok([this]()
+              { OnOk(); },
+              services::FramedTextButtonAttributes{ infra::Colour::darkGray, infra::Colour::gray, infra::Colour::darkGray, infra::Colour::white, infra::freeSans12pt7b }, "OK")
         , onSet(onSet)
     {
         infra::PartitionedTime partitioned(currentTime);

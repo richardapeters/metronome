@@ -18,3 +18,4 @@ add_subdirectory(metronome)
 
 emil_folderize_all_targets()
 emil_generate_antora_docs_target(antora-playbook.yml)
+emil_clangformat_directories(metronome DIRECTORIES local_hal metronome)

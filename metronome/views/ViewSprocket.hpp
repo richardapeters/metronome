@@ -2,8 +2,8 @@
 #define METRONOME_VIEW_SPROCKET_HPP
 
 #include "infra/util/Function.hpp"
-#include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/View.hpp"
+#include "preview/touch/TouchRecipient.hpp"
 
 namespace application
 {

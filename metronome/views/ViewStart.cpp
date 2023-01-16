@@ -6,6 +6,7 @@ namespace application
 {
     namespace
     {
+        // clang-format off
         std::array<uint8_t, 32 * 28 / 8> startBitmapData = {
             0xf0, 0x00, 0x00, 0x00,
             0xfc, 0x00, 0x00, 0x00,
@@ -69,6 +70,7 @@ namespace application
             0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00,
         };
+        // clang-format on
 
         const infra::Bitmap stopBitmap(stopBitmapData, infra::Vector(32, 28), infra::PixelFormat::blackandwhite);
     }

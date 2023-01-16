@@ -5,11 +5,11 @@
 #include "infra/util/BoundedVector.hpp"
 #include "metronome/interfaces/BeatTimer.hpp"
 #include "metronome/interfaces/Notes.hpp"
-#include "preview/touch/TouchRecipient.hpp"
 #include "preview/interfaces/BitmapPainter.hpp"
 #include "preview/interfaces/View.hpp"
+#include "preview/touch/TouchRecipient.hpp"
 
-//#define SHOW_PITCH
+// #define SHOW_PITCH
 
 namespace application
 {

@@ -42,7 +42,9 @@ namespace main_
         , viewPainter(beatPainter, bitmapPainter)
         , repainter(viewPainter, touch.GetView())
         , viewBpm(beatController, notes, bitmapPainter, beatTimer)
-        , viewCurrentTime([this]() { StartTimeEntry(); }, infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
+        , viewCurrentTime([this]()
+              { StartTimeEntry(); },
+              infra::Colour::lightGray, infra::Colour::darkGray, localTime.Id(), services::TextAttributes{ infra::Colour::blue, infra::freeSans12pt7b })
         , localTime(localTime)
     {
         touch.Add(touchBpm);
@@ -60,7 +62,8 @@ namespace main_
 
     void Metronome::StartTimeEntry()
     {
-        dateEntry.Emplace(localTime.Now(), [this](infra::TimePoint newTime) { StopTimeEntry(newTime); });
+        dateEntry.Emplace(localTime.Now(), [this](infra::TimePoint newTime)
+            { StopTimeEntry(newTime); });
         touch.Add(*dateEntry);
     }
 

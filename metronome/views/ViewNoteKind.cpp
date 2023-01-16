@@ -11,6 +11,7 @@ namespace application
     {
         services::TouchSpinInteger::WithViewFadingText::WithStorage<1>::Report(steps, from);
 
-        NotifyObservers([this](ViewNoteKindObserver& observer) { observer.SelectedNoteKind(Value()); });
+        NotifyObservers([this](ViewNoteKindObserver& observer)
+            { observer.SelectedNoteKind(Value()); });
     }
 }

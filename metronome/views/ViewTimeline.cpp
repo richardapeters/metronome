@@ -1,6 +1,6 @@
+#include "metronome/views/ViewTimeline.hpp"
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/stream/StringOutputStream.hpp"
-#include "metronome/views/ViewTimeline.hpp"
 #include "preview/fonts/Fonts.hpp"
 #include "preview/interfaces/BitmapCanvas.hpp"
 #include <cmath>
@@ -137,8 +137,7 @@ namespace application
                     Dirty(dirtyRegion);
 
                     if (subDivision == 9)
-                        beatIndex = (beatIndex + 1) % 4;
-                });
+                        beatIndex = (beatIndex + 1) % 4; });
     }
 
     float ViewTimeline::ConvertArc(uint32_t position, uint32_t scale) const
@@ -164,32 +163,32 @@ namespace application
     {
         switch (pitch)
         {
-            case 36:        // Base
+            case 36: // Base
                 return std::make_pair(0, &noteTom);
-            case 43:        // Tom 3
+            case 43: // Tom 3
                 return std::make_pair(14, &noteTom);
-            case 45:        // Tom 2
+            case 45: // Tom 2
                 return std::make_pair(12, &noteTom);
-            case 48:        // Tom 1
+            case 48: // Tom 1
                 return std::make_pair(10, &noteTom);
-            case 38:        // Snare
-            case 40:        //       rim
+            case 38: // Snare
+            case 40: //       rim
                 return std::make_pair(8, &noteTom);
-            case 42:        // Hi-hat closed
-            case 44:        // Hi-hat foot
-            case 46:        // Hi-hat open
-            case 26:        //        edge
-            case 22:        //        ...
+            case 42: // Hi-hat closed
+            case 44: // Hi-hat foot
+            case 46: // Hi-hat open
+            case 26: //        edge
+            case 22: //        ...
                 return std::make_pair(12, &noteHiHat);
-            case 51:        // Ride edge
-            case 59:        //      bow
-            case 53:        //      bell
+            case 51: // Ride edge
+            case 59: //      bow
+            case 53: //      bell
                 return std::make_pair(14, &noteHiHat);
-            case 49:        // Crash 1 bow
-            case 55:        //         edge
+            case 49: // Crash 1 bow
+            case 55: //         edge
                 return std::make_pair(16, &noteCymbal);
-            case 57:        // Crash 2 bow
-            case 52:        //         edge
+            case 57: // Crash 2 bow
+            case 52: //         edge
                 return std::make_pair(18, &noteCymbal);
             default:
                 return std::make_pair(0, &noteCymbal);

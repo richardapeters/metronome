@@ -40,7 +40,8 @@ public:
         nextTrigger = NextTrigger() - shift;
 
         if (NextTrigger() != infra::TimePoint::max())
-            timer.Start(nextTrigger, [this]() { Progressed(nextTrigger + shift); });
+            timer.Start(nextTrigger, [this]()
+                { Progressed(nextTrigger + shift); });
         else
             timer.Cancel();
     }
@@ -80,17 +81,20 @@ private:
 void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind)
 {
     subDivision = 0;
-    NotifyObservers([bpm, beatsPerMeasure](auto& observer) { observer.Started(bpm, beatsPerMeasure); });
-    timer.Start(std::chrono::microseconds(60000000 / bpm / 12), [this]()
+    NotifyObservers([bpm, beatsPerMeasure](auto& observer)
+        { observer.Started(bpm, beatsPerMeasure); });
+    timer.Start(
+        std::chrono::microseconds(60000000 / bpm / 12), [this]()
         {
             NotifyObservers([this](auto& observer) { observer.Beat(subDivision); });
-            subDivision = (subDivision + 1) % 12;
-        }, infra::triggerImmediately);
+            subDivision = (subDivision + 1) % 12; },
+        infra::triggerImmediately);
 }
 
 void BeatTimerStub::Stop()
 {
-    NotifyObservers([](auto& observer) { observer.Stopped(); });
+    NotifyObservers([](auto& observer)
+        { observer.Stopped(); });
     timer.Cancel();
 }
 
@@ -116,21 +120,21 @@ private:
     }
 
 private:
-    std::array<std::array<uint8_t, 3>, 8> groove
-    { {
-        {{ 0x99, 36, 0x10 }},
-        {{ 0x99, 46, 0x10 }},
-        {{ 0x99, 38, 0x10 }},
-        {{ 0x99, 46, 0x10 }},
-        {{ 0x99, 36, 0x10 }},
-        {{ 0x99, 36, 0x10 }},
-        {{ 0x99, 38, 0x10 }},
-        {{ 0x99, 46, 0x10 }}
-    } };
+    std::array<std::array<uint8_t, 3>, 8> groove{ { { { 0x99, 36, 0x10 } },
+        { { 0x99, 46, 0x10 } },
+        { { 0x99, 38, 0x10 } },
+        { { 0x99, 46, 0x10 } },
+        { { 0x99, 36, 0x10 } },
+        { { 0x99, 36, 0x10 } },
+        { { 0x99, 38, 0x10 } },
+        { { 0x99, 46, 0x10 } } } };
 
 private:
     infra::Function<void(infra::ConstByteRange data)> dataReceived;
-    infra::TimerRepeating timer{ infra::Duration(std::chrono::minutes(1)) / 120 / 2, [this]() { Beat(); } };
+    infra::TimerRepeating timer{ infra::Duration(std::chrono::minutes(1)) / 120 / 2, [this]()
+        {
+            Beat();
+        } };
     decltype(groove)::const_iterator currentBeat{ groove.begin() };
 };
 

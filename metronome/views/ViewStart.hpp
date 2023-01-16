@@ -1,11 +1,11 @@
 #ifndef METRONOME_VIEW_START_HPP
 #define METRONOME_VIEW_START_HPP
 
+#include "metronome/interfaces/BeatController.hpp"
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/views/ViewAligned.hpp"
 #include "preview/views/ViewIcon.hpp"
 #include "preview/views/ViewPanel.hpp"
-#include "metronome/interfaces/BeatController.hpp"
 
 namespace application
 {

@@ -13,7 +13,7 @@ namespace services
     public:
         template<int32_t width, int32_t height, infra::PixelFormat pixelFormat>
         using WithStorage = infra::WithStorage<infra::WithStorage<DoubleBufferDisplayAdaptedFromDirectDisplay,
-            infra::Bitmap::WithStorage<width, height, pixelFormat>>,
+                                                   infra::Bitmap::WithStorage<width, height, pixelFormat>>,
             infra::Bitmap::WithStorage<width, height, pixelFormat>>;
 
         DoubleBufferDisplayAdaptedFromDirectDisplay(infra::Bitmap& drawingBitmap, infra::Bitmap& viewingBitmap, hal::DirectDisplay& display);

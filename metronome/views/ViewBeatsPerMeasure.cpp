@@ -4,8 +4,7 @@
 namespace application
 {
     ViewBeatsPerMeasure::ViewBeatsPerMeasure()
-        : services::TouchSpinInteger::WithViewFadingTextDescendant<services::ViewDisableableFadingText>::WithStorage<2>
-            (4, 2, 16, false, 45, services::FadingTextAttributes{ infra::Colour::blue, infra::Colour::lightGray, infra::freeSans24pt7b })
+        : services::TouchSpinInteger::WithViewFadingTextDescendant<services::ViewDisableableFadingText>::WithStorage<2>(4, 2, 16, false, 45, services::FadingTextAttributes{ infra::Colour::blue, infra::Colour::lightGray, infra::freeSans24pt7b })
     {}
 
     void ViewBeatsPerMeasure::StartTouch(infra::Point point)
@@ -30,9 +29,11 @@ namespace application
             GetView().Enable(enabled);
 
             if (!enabled)
-                NotifyObservers([](ViewBeatsPerMeasureObserver& observer) { observer.DisabledBeatsPerMinute(); });
+                NotifyObservers([](ViewBeatsPerMeasureObserver& observer)
+                    { observer.DisabledBeatsPerMinute(); });
             else
-                NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
+                NotifyObservers([this](ViewBeatsPerMeasureObserver& observer)
+                    { observer.SelectedBeatsPerMeasure(Value()); });
         }
     }
 
@@ -43,6 +44,7 @@ namespace application
         touchRemainedAtStart = false;
 
         if (enabled)
-            NotifyObservers([this](ViewBeatsPerMeasureObserver& observer) { observer.SelectedBeatsPerMeasure(Value()); });
+            NotifyObservers([this](ViewBeatsPerMeasureObserver& observer)
+                { observer.SelectedBeatsPerMeasure(Value()); });
     }
 }

@@ -3,11 +3,11 @@
 
 #include "infra/timer/TimerService.hpp"
 #include "infra/util/BoundedDeque.hpp"
+#include "metronome/views/ViewBpm.hpp"
 #include "preview/touch/TouchRecipient.hpp"
 #include "preview/views/ViewAligned.hpp"
 #include "preview/views/ViewIcon.hpp"
 #include "preview/views/ViewPanel.hpp"
-#include "metronome/views/ViewBpm.hpp"
 
 namespace application
 {

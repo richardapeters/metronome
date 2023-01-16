@@ -4,6 +4,7 @@ namespace application
 {
     namespace
     {
+        // clang-format off
         const uint8_t noteBitmaps[] =
         {
             0x00, 0xf0, 0x00, 0x00,
@@ -180,6 +181,7 @@ namespace application
             infra::Glyph(noteBitmaps, { 352, 32, 36, 0, 0, -24 }),   // 0x33 '3'
             infra::Glyph(noteBitmaps, { 496, 32, 36, 0, 0, -24 }),   // 0x34 '4'
         };
+        // clang-format on
     }
 
     const infra::Font noteFont(infra::MemoryRange<const infra::Glyph>(noteGlyphs, noteGlyphs + sizeof(noteGlyphs) / sizeof(infra::Glyph)), 0x30, 0x35, 36, 18);

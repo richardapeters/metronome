@@ -1,5 +1,5 @@
-#include "infra/event/EventDispatcher.hpp"
 #include "metronome/application/BeatPainter.hpp"
+#include "infra/event/EventDispatcher.hpp"
 
 namespace application
 {
@@ -45,16 +45,14 @@ namespace application
                 display.SetBitmap(beatBitmap, [this]()
                     {
                         settingBitmap.clear();
-                        EvaluateSetBitmap();
-                    });
+                        EvaluateSetBitmap(); });
             }
             else
                 beatOnOffRequested = true;
 
             infra::EventDispatcher::Instance().Schedule([this]()
-                {
-                    beatOff.Start(std::chrono::milliseconds(30), [this]()
-                        {
+                { beatOff.Start(std::chrono::milliseconds(30), [this]()
+                      {
                             if (!settingBitmap.test_and_set() && onSwapDone != nullptr)
                             {
                                 onBeatOffDone = std::move(onSwapDone);
@@ -64,9 +62,7 @@ namespace application
                             beatOn = false;
                             beatOnOffRequested = true;
 
-                            EvaluateSetBitmap();
-                        });
-                });
+                            EvaluateSetBitmap(); }); });
         }
     }
 
@@ -87,16 +83,14 @@ namespace application
                     display.SetBitmap(beatBitmap, [this]()
                         {
                             settingBitmap.clear();
-                            EvaluateSetBitmap();
-                        });
+                            EvaluateSetBitmap(); });
                 else
                     display.SetBitmap(*viewingBitmap, [this]()
                         {
                             if (onBeatOffDone)
                                 onBeatOffDone();
                             settingBitmap.clear();
-                            EvaluateSetBitmap();
-                        });
+                            EvaluateSetBitmap(); });
             }
         }
         else if (!beatOn && onSwapDone != nullptr)
@@ -106,8 +100,7 @@ namespace application
                     {
                         onSwapDone();
                         settingBitmap.clear();
-                        EvaluateSetBitmap();
-                    });
+                        EvaluateSetBitmap(); });
         }
     }
 }

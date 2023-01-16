@@ -1,5 +1,5 @@
-#include "infra/stream/StringOutputStream.hpp"
 #include "metronome/views/ViewSprocket.hpp"
+#include "infra/stream/StringOutputStream.hpp"
 #include "preview/fonts/Fonts.hpp"
 #include <cmath>
 
@@ -86,8 +86,6 @@ namespace application
     infra::Point ViewSprocket::ToothCentre(int sprocket) const
     {
         auto offsetFromCentre = ViewRegion().Size().deltaX / 3;
-        return ViewRegion().Centre()
-            + infra::Vector(static_cast<int16_t>(std::cos(2 * pi * sprocket / values.size() + 2 * pi * adjustStart / 4) * offsetFromCentre)
-                , static_cast<int16_t>(std::sin(2 * pi * sprocket / values.size() + 2 * pi * adjustStart / 4) * offsetFromCentre));
+        return ViewRegion().Centre() + infra::Vector(static_cast<int16_t>(std::cos(2 * pi * sprocket / values.size() + 2 * pi * adjustStart / 4) * offsetFromCentre), static_cast<int16_t>(std::sin(2 * pi * sprocket / values.size() + 2 * pi * adjustStart / 4) * offsetFromCentre));
     }
 }

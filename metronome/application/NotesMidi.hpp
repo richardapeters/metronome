@@ -26,7 +26,7 @@ namespace application
         uint16_t Now() const;
 
     private:
-        enum class State: uint8_t
+        enum class State : uint8_t
         {
             initial,
             receivedNoteOn,

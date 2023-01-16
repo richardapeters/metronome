@@ -1,5 +1,5 @@
-#include "infra/event/EventDispatcher.hpp"
 #include "metronome/main_win/MultiBufferDisplayAdaptedFromDirectDisplay.hpp"
+#include "infra/event/EventDispatcher.hpp"
 
 namespace services
 {

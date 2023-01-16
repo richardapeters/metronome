@@ -1,6 +1,6 @@
+#include "metronome/application/NotesMidi.hpp"
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/util/BitLogic.hpp"
-#include "metronome/application/NotesMidi.hpp"
 #include <algorithm>
 
 namespace application
@@ -11,8 +11,7 @@ namespace application
         serial.ReceiveData([this](infra::ConstByteRange data)
             {
                 for (auto byte : data)
-                    ReceivedByte(byte);
-            });
+                    ReceivedByte(byte); });
     }
 
     void NotesMidi::Beat(uint8_t subDivision)
@@ -61,8 +60,7 @@ namespace application
                 infra::EventDispatcher::Instance().Schedule([this, note]()
                     {
                         if (running)
-                            GetObserver().NoteAdded(note);
-                    });
+                            GetObserver().NoteAdded(note); });
             }
             else if (state == State::receivedPitch)
                 state = State::initial;

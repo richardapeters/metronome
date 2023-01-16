@@ -1,5 +1,5 @@
-#include "generated/stm32fxxx/PeripheralTable.hpp"
 #include "local_hal/stm32fxxx/SaiStm.hpp"
+#include "generated/stm32fxxx/PeripheralTable.hpp"
 #include <cassert>
 
 #if defined(HAS_PERIPHERAL_SAI)
@@ -16,7 +16,7 @@ namespace hal
         , sd(sd, PinConfigTypeStm::saiSd, oneBasedinstance)
         , fs(fs, PinConfigTypeStm::saiFs, oneBasedinstance)
         , saiBlockHandle(reinterpret_cast<SAI_Block_TypeDef*>(peripheralSai[instance] + 1))
-        , tx(dma, DmaChannelId{ 2, 4, 3 }, &saiBlockHandle->DR, [this]() {})    // SAI 2A
+        , tx(dma, DmaChannelId{ 2, 4, 3 }, &saiBlockHandle->DR, [this]() {}) // SAI 2A
     {
         Init();
     }
@@ -28,7 +28,7 @@ namespace hal
         , sd(sd, PinConfigTypeStm::saiSd, oneBasedinstance)
         , fs(fs, PinConfigTypeStm::saiFs, oneBasedinstance)
         , saiBlockHandle(reinterpret_cast<SAI_Block_TypeDef*>(peripheralSai[instance] + 1) + 1)
-        , tx(dma, DmaChannelId{ 2, 6, 3 }, &saiBlockHandle->DR, [this]() {})    // SAI 2B
+        , tx(dma, DmaChannelId{ 2, 6, 3 }, &saiBlockHandle->DR, [this]() {}) // SAI 2B
     {
         Init();
     }

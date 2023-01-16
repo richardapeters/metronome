@@ -26,7 +26,11 @@ namespace services
         : releaser(releaser)
         , scl(scl, false)
         , sda(sda)
-        , toggling(std::chrono::milliseconds(1), [this]() { Release(); }, std::chrono::milliseconds(1), [this]() { Activate(); })
+        , toggling(
+              std::chrono::milliseconds(1), [this]()
+              { Release(); },
+              std::chrono::milliseconds(1), [this]()
+              { Activate(); })
     {}
 
     void StuckI2cReleaser::Unstucking::SendData(hal::I2cAddress address, infra::ConstByteRange data, hal::Action nextAction, infra::Function<void(hal::Result, uint32_t numberOfBytesSent)> onSent)

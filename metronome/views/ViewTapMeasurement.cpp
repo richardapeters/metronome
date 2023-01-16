@@ -6,6 +6,7 @@ namespace application
 {
     namespace
     {
+        // clang-format off
         std::array<uint8_t, 32 * 28 / 8> tapBitmapData = {
             0x02, 0x10, 0x00, 0x00,
             0x22, 0x20, 0x00, 0x00,
@@ -36,6 +37,7 @@ namespace application
             0x00, 0x00, 0x7f, 0x00,
             0x00, 0x00, 0x1e, 0x00,
         };
+        // clang-format on
 
         infra::Bitmap tapBitmap(tapBitmapData, infra::Vector(32, 28), infra::PixelFormat::blackandwhite);
     }
