@@ -20,6 +20,10 @@
       "displayName": "windows",
       "description": "Build Metronome for Windows host",
       "inherits": "defaults",
+      "cacheVariables": {
+        "EMIL_BUILD_TESTS": true,
+        "PREVIEW_BUILD_TESTS": true
+      },
       "architecture": {
         "value": "x86",
         "strategy": "external"

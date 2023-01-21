@@ -5,7 +5,6 @@ project(Metronome)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(EMIL_ENABLE_DOCKER_TOOLS false)
-set(EMIL_BUILD_TESTS true)
 enable_testing()
 
 set(emil_POPULATED TRUE)
