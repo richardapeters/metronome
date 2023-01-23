@@ -1,4 +1,4 @@
-if (${TARGET_BUILD_CORTEX} AND ${TARGET_MCU} STREQUAL STM32F746)
+if (${TARGET_BUILD_CORTEX} AND ${TARGET_MCU} STREQUAL stm32f746)
 
     add_executable(metronome.main_stm32f746)
 
