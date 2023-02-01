@@ -17,7 +17,6 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wno-psabi)
 endif()
 
-add_subdirectory(file_extractor)
 add_subdirectory(local_hal)
 add_subdirectory(metronome)
 

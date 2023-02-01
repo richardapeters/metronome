@@ -43,7 +43,7 @@
         "dev": false
       },
       "cacheVariables": {
-        "emil_DIR": "${sourceDir}/build/windows/_deps/emil-build/cmake",
+        "emil_DIR": "${sourceDir}/build/windows/EmbeddedInfraLib/cmake",
         "EMIL_GENERATE_PACKAGE_CONFIG": false,
         "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
         "TARGET_MCU_VENDOR": "st",
