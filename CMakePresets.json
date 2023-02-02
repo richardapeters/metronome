@@ -43,7 +43,7 @@
         "dev": false
       },
       "cacheVariables": {
-        "emil_DIR": "${sourceDir}/build/windows/EmbeddedInfraLib/cmake",
+        "emil_DIR": "${sourceDir}/build/windows/amp-embedded-infra-lib/cmake",
         "EMIL_GENERATE_PACKAGE_CONFIG": false,
         "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
         "TARGET_MCU_VENDOR": "st",

@@ -7,10 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(EMIL_ENABLE_DOCKER_TOOLS false)
 enable_testing()
 
-set(emil_POPULATED TRUE)
-add_subdirectory(EmbeddedInfraLib)
-add_subdirectory(Preview)
-add_subdirectory(HalSt)
+add_subdirectory(amp-embedded-infra-lib)
+add_subdirectory(amp-preview)
+add_subdirectory(amp-hal-st)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Suppress warnings about parameter passing for argument of type '...' changed in GCC 7.1
