@@ -47,8 +47,8 @@ if (${TARGET_BUILD_CORTEX} AND ${TARGET_MCU} STREQUAL stm32f746)
     add_custom_command(
         TARGET metronome.main_stm32f746
         POST_BUILD
-        COMMAND ${CCOLA_OBJ_COPY_TOOL} -O binary "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.bin"
-        COMMAND ${CCOLA_OBJ_COPY_TOOL} -O ihex "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.hex"
+        COMMAND ${EMIL_OBJ_COPY_TOOL} -O binary "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.bin"
+        COMMAND ${EMIL_OBJ_COPY_TOOL} -O ihex "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.hex"
     )
 
 endif()
