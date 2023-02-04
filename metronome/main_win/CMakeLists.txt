@@ -1,4 +1,4 @@
-if (${CMAKE_SYSTEM_NAME} STREQUAL Windows)
+if (EMIL_BUILD_WIN)
 
     add_executable(metronome.main_win WIN32)
 

@@ -16,10 +16,18 @@
       }
     },
     {
-      "name": "windows",
-      "displayName": "windows",
-      "description": "Build Metronome for Windows host",
+      "name": "host",
+      "description": "Build required tools for host",
       "inherits": "defaults",
+      "cacheVariables": {
+        "EMIL_BUILD_TESTS": false,
+        "PREVIEW_BUILD_TESTS": false
+      }
+    },
+    {
+      "name": "windows",
+      "description": "Build Metronome for Windows host",
+      "inherits": "host",
       "cacheVariables": {
         "EMIL_BUILD_TESTS": true,
         "PREVIEW_BUILD_TESTS": true

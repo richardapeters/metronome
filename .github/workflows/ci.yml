@@ -1,0 +1,41 @@
+---
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Embedded Build
+    strategy:
+      matrix:
+        preset: ["stm32f746"]
+        configuration: ["RelWithDebInfo"]
+    runs-on: [self-hosted, linux, x64, philips]
+    container: dl-innersource-docker.artifactory-ehv.ta.philips.com/amp-devcontainer-gcc-10:v2.0.0
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+        with:
+          persist-credentials: false
+          submodules: true
+          token: ${{ secrets.AMP_ACCESS_TOKEN }}
+      - uses: hendrikmuhs/ccache-action@fba817f3c0db4f854d7a3ee688241d6754da166e # v1.2.8
+        with:
+          key: ${{ matrix.preset}}-${{ matrix.configuration }}
+      - uses: lukka/run-cmake@71d20a810daaf5340669b8cce5c9fe583780e147
+        with:
+          configurePreset: "host"
+          buildPreset: "host-${{ matrix.configuration }}"
+          configurePresetAdditionalArgs: "['-DCMAKE_C_COMPILER_LAUNCHER=ccache', '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
+      - uses: lukka/run-cmake@71d20a810daaf5340669b8cce5c9fe583780e147
+        with:
+          configurePreset: "${{ matrix.preset }}"
+          buildPreset: "${{ matrix.preset }}-${{ matrix.configuration }}"
+          configurePresetAdditionalArgs: "['-DCMAKE_C_COMPILER_LAUNCHER=ccache', '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
