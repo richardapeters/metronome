@@ -17,17 +17,8 @@
     },
     {
       "name": "host",
-      "description": "Build required tools for host",
+      "description": "Build Metronome for host",
       "inherits": "defaults",
-      "cacheVariables": {
-        "EMIL_BUILD_TESTS": false,
-        "PREVIEW_BUILD_TESTS": false
-      }
-    },
-    {
-      "name": "windows",
-      "description": "Build Metronome for Windows host",
-      "inherits": "host",
       "cacheVariables": {
         "EMIL_BUILD_TESTS": true,
         "PREVIEW_BUILD_TESTS": true
@@ -51,7 +42,7 @@
         "dev": false
       },
       "cacheVariables": {
-        "emil_DIR": "${sourceDir}/build/windows/amp-embedded-infra-lib/cmake",
+        "emil_DIR": "${sourceDir}/build/host/amp-embedded-infra-lib/cmake",
         "EMIL_GENERATE_PACKAGE_CONFIG": false,
         "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
         "TARGET_MCU_VENDOR": "st",
@@ -63,14 +54,9 @@
   ],
   "buildPresets": [
     {
-      "name": "windows-Debug",
+      "name": "host-Debug",
       "configuration": "Debug",
-      "configurePreset": "windows"
-    },
-    {
-      "name": "windows-RelWithDebInfo",
-      "configuration": "RelWithDebInfo",
-      "configurePreset": "windows"
+      "configurePreset": "host"
     },
     {
       "name": "host-RelWithDebInfo",
@@ -92,7 +78,7 @@
     {
       "name": "Tests",
       "configuration": "Debug",
-      "configurePreset": "windows"
+      "configurePreset": "host"
     }
   ]
 }
