@@ -6,14 +6,14 @@ site:
 content:
   sources:
     - url: .
-      start_path: EmbeddedInfraLib/documents
+      start_path: amp-embedded-infra-lib/documents
       branches:
-        - master
+        - main
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
-  supplemental_files: ./EmbeddedInfraLib/documents/supplemental-ui
+  supplemental_files: ./amp-embedded-infra-lib/documents/supplemental-ui
 asciidoc:
   attributes:
     plantuml-server-url: http://www.plantuml.com/plantuml
