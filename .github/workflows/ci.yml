@@ -29,7 +29,7 @@ jobs:
         with:
           configurePreset: "host"
           buildPreset: "host-RelWithDebInfo"
-          testPreset: "Tests"
+          testPreset: "Tests-RelWithDebInfo"
           configurePresetAdditionalArgs: "['-DCMAKE_C_COMPILER_LAUNCHER=sccache', '-DCMAKE_CXX_COMPILER_LAUNCHER=sccache']"
   embedded_build:
     name: Embedded Build

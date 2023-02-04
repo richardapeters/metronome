@@ -76,8 +76,13 @@
   ],
   "testPresets": [
     {
-      "name": "Tests",
+      "name": "Tests-Debug",
       "configuration": "Debug",
+      "configurePreset": "host"
+    },
+    {
+      "name": "Tests-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
       "configurePreset": "host"
     }
   ]
