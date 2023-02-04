@@ -73,6 +73,11 @@
       "configurePreset": "windows"
     },
     {
+      "name": "host-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "host"
+    },
+    {
       "name": "STM32F746-Debug",
       "configuration": "Debug",
       "configurePreset": "stm32f746"
