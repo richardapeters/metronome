@@ -64,12 +64,12 @@
       "configurePreset": "host"
     },
     {
-      "name": "STM32F746-Debug",
+      "name": "stm32f746-Debug",
       "configuration": "Debug",
       "configurePreset": "stm32f746"
     },
     {
-      "name": "STM32F746-RelWithDebInfo",
+      "name": "stm32f746-RelWithDebInfo",
       "configuration": "RelWithDebInfo",
       "configurePreset": "stm32f746"
     }
