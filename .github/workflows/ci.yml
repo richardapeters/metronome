@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         preset: ["stm32f746"]
-        configuration: ["RelWithDebInfo"]
+        configuration: ["RelWithDebInfo", "Debug"]
     runs-on: ubuntu-latest
     container: ghcr.io/philips-software/amp-devcontainer:2.2.0
     steps:

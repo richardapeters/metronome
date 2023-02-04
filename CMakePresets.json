@@ -12,7 +12,7 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "generator": "Ninja Multi-Config",
       "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+        "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo"
       }
     },
     {
