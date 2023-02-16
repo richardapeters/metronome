@@ -22,7 +22,10 @@ namespace hal
 
     private:
         infra::TimePoint now = infra::TimePoint();
-        hal::ImmediateInterruptHandler timerInterrupt{ LPTIM1_IRQn, [this]() { Reload(); } };
+        hal::ImmediateInterruptHandler timerInterrupt{ LPTIM1_IRQn, [this]()
+            {
+                Reload();
+            } };
         uint32_t reload = 32768;
         uint32_t previousReload = reload;
     };

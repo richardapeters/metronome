@@ -1,12 +1,12 @@
 #include "generated/clicks/Click.hpp"
 #include "generated/clicks/ClickAccent.hpp"
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
-#include "hal_st/stm32fxxx/UartStmDma.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
+#include "hal_st/stm32fxxx/UartStmDma.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
 #include "infra/stream/ByteInputStream.hpp"
-#include "metronome/instantiations/Metronome.hpp"
 #include "metronome/application/Wm8994.hpp"
+#include "metronome/instantiations/Metronome.hpp"
 #include "metronome/main_stm32f746/Flash.hpp"
 #include "metronome/main_stm32f746/Lcd.hpp"
 #include "metronome/main_stm32f746/MetronomeBeatTimerStm.hpp"
@@ -52,7 +52,6 @@ struct WavHeaderChunkFormat
     uint16_t bla;
     uint16_t bitsPerSample;
 };
-
 
 bool StringArrayEqual(infra::MemoryRange<const char> array, infra::BoundedConstString string)
 {
@@ -141,7 +140,7 @@ int main()
     static infra::MemoryRange<const int16_t> softClick = CreateSoftClick(click);
 
     static application::Wm8994 wm8994(peripheralI2c.i2cAudio, []()
-    {
+        {
         static hal::GpioPinStm midiRx(hal::Port::C, 7);
         static hal::UartStmDma::Config config;
         config.baudrate = 31250;
@@ -150,26 +149,25 @@ int main()
         static application::MetronomeBeatTimerStm beatTimer(sai.controller, clickAccent, click, softClick);
         static hal::BitmapPainterStm bitmapPainter;
         static main_::Metronome metronome(lcd.lcd.DisplaySize(), rtc.rtc, beatTimer, lcd.lcd, bitmapPainter, midi, lcd.bitmap0, lcd.bitmap1, lcd.beatBitmap);
-        static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch);
-    });
+        static main_::Touch touch(peripheralI2c.i2cTouch, metronome.touch); });
 
     // Detect SD card
-/*
-    hal::GpioPinStm sdClk(hal::Port::C, 12);
-    hal::GpioPinStm sdCmd(hal::Port::D, 2);
-    hal::GpioPinStm sdD0(hal::Port::C, 8);
-    hal::GpioPinStm sdD1(hal::Port::C, 9);
-    hal::GpioPinStm sdD2(hal::Port::C, 10);
-    hal::GpioPinStm sdD3(hal::Port::C, 11);
-    static hal::SdStm sd(1, sdClk, sdCmd, sdD0, sdD1, sdD2, sdD3, []()
-    {
-        static std::array<uint8_t, 512> data;
-        sd.ReadBuffer(data, 0, []()
+    /*
+        hal::GpioPinStm sdClk(hal::Port::C, 12);
+        hal::GpioPinStm sdCmd(hal::Port::D, 2);
+        hal::GpioPinStm sdD0(hal::Port::C, 8);
+        hal::GpioPinStm sdD1(hal::Port::C, 9);
+        hal::GpioPinStm sdD2(hal::Port::C, 10);
+        hal::GpioPinStm sdD3(hal::Port::C, 11);
+        static hal::SdStm sd(1, sdClk, sdCmd, sdD0, sdD1, sdD2, sdD3, []()
         {
-            __BKPT();
+            static std::array<uint8_t, 512> data;
+            sd.ReadBuffer(data, 0, []()
+            {
+                __BKPT();
+            });
         });
-    });
-*/
+    */
     eventDispatcher.Run();
     __builtin_unreachable();
 }

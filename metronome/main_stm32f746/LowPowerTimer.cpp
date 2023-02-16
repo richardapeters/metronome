@@ -1,5 +1,5 @@
-#include "infra/event/EventDispatcher.hpp"
 #include "metronome/main_stm32f746/LowPowerTimer.hpp"
+#include "infra/event/EventDispatcher.hpp"
 #include "services/tracer/GlobalTracer.hpp"
 
 namespace hal

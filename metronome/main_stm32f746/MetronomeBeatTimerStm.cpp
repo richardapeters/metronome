@@ -23,14 +23,16 @@ namespace application
 
         currentBeat = 0;
 
-        NotifyObservers([bpm, beatsPerMeasure](auto& observer) { observer.Started(bpm, beatsPerMeasure); });
+        NotifyObservers([bpm, beatsPerMeasure](auto& observer)
+            { observer.Started(bpm, beatsPerMeasure); });
         hal::LowPowerTimer::Start();
         Reload();
     }
 
     void MetronomeBeatTimerStm::Stop()
     {
-        NotifyObservers([](auto& observer) { observer.Stopped(); });
+        NotifyObservers([](auto& observer)
+            { observer.Stopped(); });
         hal::LowPowerTimer::Stop();
         cumulative = 0;
         amount = 0;
@@ -51,7 +53,8 @@ namespace application
         SetNextReload();
         hal::LowPowerTimer::Reload();
 
-        NotifyObservers([this](auto& observer) { observer.Beat(currentBeat % 12); });
+        NotifyObservers([this](auto& observer)
+            { observer.Beat(currentBeat % 12); });
 
         ++currentBeat;
         if (currentBeat == beatsPerMeasure.ValueOr(1) * 12)

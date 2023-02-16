@@ -13,7 +13,11 @@ namespace main_
         hal::GpioPinStm scl{ hal::Port::H, 7 };
         hal::GpioPinStm sda{ hal::Port::H, 8 };
         infra::Optional<hal::I2cStm> i2c;
-        services::StuckI2cReleaser stuckI2cReleaser{ scl, sda, [this]()->hal::I2cMaster& { i2c.Emplace(3, scl, sda); return *i2c; } };
+        services::StuckI2cReleaser stuckI2cReleaser{ scl, sda, [this]() -> hal::I2cMaster&
+            {
+                i2c.Emplace(3, scl, sda);
+                return *i2c;
+            } };
         services::I2cMultipleAccessMaster i2cMaster{ stuckI2cReleaser };
         services::I2cMultipleAccess i2cTouch{ i2cMaster };
         services::I2cMultipleAccess i2cAudio{ i2cMaster };

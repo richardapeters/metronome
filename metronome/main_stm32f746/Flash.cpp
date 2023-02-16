@@ -13,4 +13,3 @@ namespace main_
         , flash(quadSpi, onInitialized)
     {}
 }
-
