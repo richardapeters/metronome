@@ -12,7 +12,8 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "generator": "Ninja Multi-Config",
       "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo"
+        "CMAKE_CONFIGURATION_TYPES": "Debug;RelWithDebInfo",
+        "PREVIEW_BUILD_EXAMPLES": true
       }
     },
     {
@@ -21,7 +22,8 @@
       "inherits": "defaults",
       "cacheVariables": {
         "EMIL_BUILD_TESTS": true,
-        "PREVIEW_BUILD_TESTS": true
+        "PREVIEW_BUILD_TESTS": true,
+        "PREVIEW_INCLUDE_SDL": true
       },
       "architecture": {
         "value": "x86",
@@ -37,7 +39,7 @@
       "displayName": "stm32f746",
       "description": "Build Metronome for STM32F746",
       "inherits": "defaults",
-      "toolchainFile": "${sourceDir}/toolchain-arm-gcc.cmake",
+      "toolchainFile": "${sourceDir}/amp-embedded-infra-lib/cmake/toolchain-arm-gcc-m7-fpv5-sp-d16.cmake",
       "warnings": {
         "dev": false
       },
@@ -45,10 +47,10 @@
         "emil_DIR": "${sourceDir}/build/host/amp-embedded-infra-lib/cmake",
         "EMIL_GENERATE_PACKAGE_CONFIG": false,
         "EMIL_PACKAGE_CONFIG_IMPORT_NAMESPACE": "emil::",
+        "TARGET_CORTEX": "m7",
         "TARGET_MCU_VENDOR": "st",
-        "TARGET_MCU": "stm32f746",
         "TARGET_MCU_FAMILY": "stm32f7xx",
-        "TARGET_BUILD_CORTEX": true
+        "TARGET_MCU": "stm32f746"
       }
     }
   ],

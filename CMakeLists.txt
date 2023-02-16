@@ -7,13 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(EMIL_ENABLE_DOCKER_TOOLS false)
 enable_testing()
 
+set(EMIL_BUILD_EXAMPLES true)
+set(EMIL_INCLUDE_THREADX true)
+
 add_subdirectory(amp-embedded-infra-lib)
 add_subdirectory(amp-preview)
 add_subdirectory(amp-hal-st)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Suppress warnings about parameter passing for argument of type '...' changed in GCC 7.1
-    add_compile_options(-Wno-psabi)
+    add_compile_options($<$<COMPILE_LANGUAGE:C>:-Wno-psabi>)
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-psabi>)
 endif()
 
 add_subdirectory(local_hal)
