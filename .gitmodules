@@ -6,4 +6,4 @@
 	url = https://github.com/philips-software/amp-hal-st.git
 [submodule "Preview"]
 	path = amp-preview
-	url = https://github.com/philips-internal/amp-preview.git
+	url = https://github.com/philips-software/amp-preview.git
