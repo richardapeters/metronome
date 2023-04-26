@@ -58,7 +58,8 @@ namespace application
         for (const auto& note : notes)
             canvas.DrawTransparentBitmap(std::get<0>(note), *std::get<1>(note), infra::ConvertRgb888To(infra::Colour::white, std::get<1>(note)->pixelFormat), boundingRegion);
 
-        canvas.DrawTransparentBitmap(nowIndicatorPosition, nowIndicator, infra::ConvertRgb888To(infra::Colour::white, nowIndicator.pixelFormat), boundingRegion);
+        if (nowIndicatorPosition != infra::Point())
+            canvas.DrawTransparentBitmap(nowIndicatorPosition, nowIndicator, infra::ConvertRgb888To(infra::Colour::white, nowIndicator.pixelFormat), boundingRegion);
 
 #ifdef SHOW_PITCH
         if (lastPitch)
@@ -157,7 +158,10 @@ namespace application
     }
 
     void ViewTimeline::Stopped()
-    {}
+    {
+        Dirty(ViewRegion());
+        nowIndicatorPosition = infra::Point();
+    }
 
     std::pair<uint8_t, const infra::Bitmap*> ViewTimeline::PitchToDistanceAndBitmap(uint8_t pitch) const
     {

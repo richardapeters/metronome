@@ -35,7 +35,7 @@ namespace application
 
         infra::TimePoint beatStart;
         infra::Duration beatDuration;
-        uint8_t beatsPerMeasure;
+        uint8_t beatsPerMeasure{ 4 };
         uint8_t beatInMeasure;
         bool running = false;
     };
