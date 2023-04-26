@@ -24,11 +24,11 @@ namespace hal
         handle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
         handle.Init.ClockDiv = SDMMC_TRANSFER_CLK_DIV;
 
-        HAL_SD_Init(&handle, &cardInfo);
-        HAL_SD_WideBusOperation_Config(&handle, SDMMC_BUS_WIDE_4B);
+        HAL_SD_Init(&handle);
+        HAL_SD_ConfigWideBusOperation(&handle, SDMMC_BUS_WIDE_4B);
 
-        numberOfSectors = cardInfo.CardCapacity / cardInfo.CardBlockSize;
-        sizeOfEachSector = cardInfo.CardBlockSize;
+        numberOfSectors = cardInfo.BlockNbr;
+        sizeOfEachSector = cardInfo.BlockSize;
 
         infra::EventDispatcher::Instance().Schedule(onInitialized);
     }
@@ -67,11 +67,11 @@ namespace hal
 
         while (!buffer.empty())
         {
-            std::array<uint32_t, 1024 / 4> data;
-            auto result = HAL_SD_ReadBlocks(&handle, data.begin(), address, 512, 1);
-            really_assert(result == SD_OK);
+            std::array<uint8_t, 1024> data;
+            auto result = HAL_SD_ReadBlocks(&handle, data.begin(), address, 1, 0);
+            really_assert(result == HAL_OK);
 
-            auto byteData = infra::Head(infra::DiscardHead(infra::ReinterpretCastByteRange(infra::MakeRange(data)), discard), buffer.size());
+            auto byteData = infra::Head(infra::DiscardHead(infra::MakeRange(data), discard), buffer.size());
             infra::Copy(byteData, buffer);
             buffer.pop_front(byteData.size());
             address += discard + byteData.size();

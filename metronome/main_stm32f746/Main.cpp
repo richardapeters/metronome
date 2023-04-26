@@ -1,6 +1,7 @@
 #include "generated/clicks/Click.hpp"
 #include "generated/clicks/ClickAccent.hpp"
 #include "generated/stm32fxxx/PinoutTableDefault.hpp"
+#include "hal_st/stm32fxxx/DefaultClockDiscoveryF746G.hpp"
 #include "hal_st/stm32fxxx/SystemTickTimerService.hpp"
 #include "hal_st/stm32fxxx/UartStmDma.hpp"
 #include "infra/event/EventDispatcherWithWeakPtr.hpp"
@@ -19,16 +20,6 @@
 #include "preview/stm32fxxx/BitmapPainterStm.hpp"
 #include "services/tracer/GlobalTracer.hpp"
 #include "services/util/DebugLed.hpp"
-
-uint32_t GetHseValue()
-{
-    return 25000000;
-}
-
-extern "C" void Default_Handler()
-{
-    hal::InterruptTable::Instance().Invoke(hal::ActiveInterrupt());
-}
 
 struct WavHeader
 {
@@ -120,8 +111,13 @@ infra::MemoryRange<const int16_t> CreateSoftClick(infra::MemoryRange<const int16
 infra::MemoryRange<const int16_t> clickAccent(ReadClick(clicks::clickAccent));
 infra::MemoryRange<const int16_t> click(ReadClick(clicks::click));
 
+unsigned int hse_value = 25000000;
+
 int main()
 {
+    HAL_Init();
+    ConfigureDefaultClockDiscoveryF746G();
+
     static hal::InterruptTable::WithStorage<128> interruptTable;
     static infra::EventDispatcherWithWeakPtr::WithSize<50> eventDispatcher;
     static hal::GpioStm gpio(hal::pinoutTableDefaultStm);

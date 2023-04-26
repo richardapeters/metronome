@@ -11,8 +11,8 @@ set(EMIL_BUILD_EXAMPLES true)
 set(EMIL_INCLUDE_THREADX true)
 
 add_subdirectory(amp-embedded-infra-lib)
-add_subdirectory(amp-preview)
 add_subdirectory(amp-hal-st)
+add_subdirectory(amp-preview)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Suppress warnings about parameter passing for argument of type '...' changed in GCC 7.1

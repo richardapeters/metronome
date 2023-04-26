@@ -33,7 +33,7 @@ namespace hal
         hal::PeripheralPinStm d3;
 
         SD_HandleTypeDef handle{};
-        HAL_SD_CardInfoTypedef cardInfo{};
+        HAL_SD_CardInfoTypeDef cardInfo{};
 
         uint64_t numberOfSectors = 0;
         uint32_t sizeOfEachSector = 0;

@@ -40,15 +40,9 @@ if (TARGET_MCU STREQUAL stm32f746)
         m
     )
 
-    target_link_options(metronome.main_stm32f746 PRIVATE
-        "LINKER:-Map=$<TARGET_FILE:metronome.main_stm32f746>.map"
-    )
+    halst_target_default_linker_scripts(metronome.main_stm32f746)
+    halst_target_default_init(metronome.main_stm32f746)
 
-    add_custom_command(
-        TARGET metronome.main_stm32f746
-        POST_BUILD
-        COMMAND ${EMIL_OBJ_COPY_TOOL} -O binary "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.bin"
-        COMMAND ${EMIL_OBJ_COPY_TOOL} -O ihex "$<TARGET_FILE:metronome.main_stm32f746>" "$<TARGET_FILE:metronome.main_stm32f746>.hex"
-    )
+    emil_generate_artifacts(TARGET metronome.main_stm32f746 LST MAP BIN HEX)
 
 endif()
