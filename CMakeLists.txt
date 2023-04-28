@@ -7,8 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(EMIL_ENABLE_DOCKER_TOOLS false)
 enable_testing()
 
-set(EMIL_BUILD_EXAMPLES true)
-set(EMIL_INCLUDE_THREADX true)
+if (MINGW)
+    # When compiling with MINGW, dynamically linking to the standard C++ library results in linking to libstdc++-6.dll.
+    # The libstdc++-6.dll found during runtime is often different than the one with which the application is compiled with,
+    # so instead of linking dynamically, we statically link to the standard C++ library.
+    add_link_options("-static-libstdc++")
+endif()
 
 add_subdirectory(amp-embedded-infra-lib)
 add_subdirectory(amp-hal-st)
