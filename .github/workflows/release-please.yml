@@ -21,7 +21,7 @@ jobs:
       releases_created: ${{ steps.release.outputs.releases_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: google-github-actions/release-please-action@514bc6cdae71484c998108f2136a8f5e4c62b9b9 # v3.7.3
+      - uses: google-github-actions/release-please-action@c078ea33917ab8cfa5300e48f4b7e6b16606aede # v3.7.8
         id: release
         with:
           command: manifest
