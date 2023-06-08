@@ -14,6 +14,8 @@ target_sources(metronome.views PRIVATE
     ViewBpm.hpp
     ViewDateEntry.cpp
     ViewDateEntry.hpp
+    ViewGap.cpp
+    ViewGap.hpp
     ViewNoteKind.cpp
     ViewNoteKind.hpp
     ViewSprocket.cpp

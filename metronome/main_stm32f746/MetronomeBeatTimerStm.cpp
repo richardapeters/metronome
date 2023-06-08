@@ -38,7 +38,34 @@ namespace application
         amount = 0;
     }
 
+    void MetronomeBeatTimerStm::Gap(uint8_t gap)
+    {
+        this->gap = gap;
+    }
+
     void MetronomeBeatTimerStm::Reload()
+    {
+        if (gapIndex == 0)
+            TransferBeat();
+
+        SetNextReload();
+        hal::LowPowerTimer::Reload();
+
+        NotifyObservers([this](auto& observer)
+            { observer.Beat(currentBeat % 12, gapIndex != 0); });
+
+        ++currentBeat;
+        if (currentBeat == beatsPerMeasure.ValueOr(1) * 12)
+        {
+            currentBeat = 0;
+
+            ++gapIndex;
+            if (gapIndex > gap)
+                gapIndex = 0;
+        }
+    }
+
+    void MetronomeBeatTimerStm::TransferBeat()
     {
         if (beatsPerMeasure != infra::none && currentBeat == 0)
             sai.Transfer(dataAccent);
@@ -49,16 +76,6 @@ namespace application
         }
         else if (currentBeat % (12 / subSteps[noteKind]) == 0)
             sai.Transfer(dataSub);
-
-        SetNextReload();
-        hal::LowPowerTimer::Reload();
-
-        NotifyObservers([this](auto& observer)
-            { observer.Beat(currentBeat % 12); });
-
-        ++currentBeat;
-        if (currentBeat == beatsPerMeasure.ValueOr(1) * 12)
-            currentBeat = 0;
     }
 
     void MetronomeBeatTimerStm::SetNextReload()

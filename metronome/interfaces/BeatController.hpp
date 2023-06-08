@@ -19,6 +19,7 @@ namespace application
         virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) = 0;
         virtual void DisabledBeatsPerMinute() = 0;
         virtual void SelectedNoteKind(uint8_t noteKind) = 0;
+        virtual void SelectedGap(uint8_t gap) = 0;
     };
 }
 

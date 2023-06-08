@@ -30,6 +30,18 @@ namespace application
     {
         beatController.SelectedNoteKind(noteKind);
     }
+
+    GapInteractor::GapInteractor(ViewGap& subject, BeatController& beatController)
+        : ViewGapObserver(subject)
+        , beatController(beatController)
+    {
+        beatController.SelectedGap(Subject().Value());
+    }
+
+    void GapInteractor::SelectedGap(uint8_t gap)
+    {
+        beatController.SelectedGap(gap);
+    }
 }
 
 namespace main_
@@ -56,6 +68,7 @@ namespace main_
         touchVertical.AddFill(touchHorizontalMid, 3);
         touchHorizontalMid.AddFill(viewBeatsPerMeasure, 1);
         touchHorizontalMid.AddFill(viewNoteKind, 1);
+        touchHorizontalMid.AddFill(viewGap, 1);
         touchVertical.AddFill(viewCurrentTime, 1);
         touch.GetView().ResetLayout(size);
     }

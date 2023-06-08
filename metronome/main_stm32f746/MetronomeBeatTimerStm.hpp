@@ -16,11 +16,13 @@ namespace application
 
         virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) override;
         virtual void Stop() override;
+        virtual void Gap(uint8_t gap) override;
 
     protected:
         virtual void Reload() override;
 
     private:
+        void TransferBeat();
         void SetNextReload();
 
     private:
@@ -38,6 +40,9 @@ namespace application
         uint32_t total;
         uint32_t cumulative = 0;
         uint8_t currentBeat;
+
+        uint8_t gap = 0;
+        uint8_t gapIndex = 0;
     };
 }
 

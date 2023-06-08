@@ -27,6 +27,7 @@ namespace application
         virtual void SelectedBeatsPerMeasure(uint8_t beatsPerMeasure) override;
         virtual void DisabledBeatsPerMinute() override;
         virtual void SelectedNoteKind(uint8_t noteKind) override;
+        virtual void SelectedGap(uint8_t gap) override;
 
     private:
         BeatTimer& beatTimer;

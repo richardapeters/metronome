@@ -108,7 +108,7 @@ namespace application
         Dirty(infra::Region(origin, bitmap->size));
     }
 
-    void ViewTimeline::Beat(uint8_t subDivision)
+    void ViewTimeline::Beat(uint8_t subDivision, bool gapped)
     {
         if (subDivision % 3 == 0)
             infra::EventDispatcher::Instance().Schedule([this, subDivision]()

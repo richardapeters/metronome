@@ -71,10 +71,14 @@ class BeatTimerStub
 public:
     virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) override;
     virtual void Stop() override;
+    virtual void Gap(uint8_t gap) override;
 
 private:
     infra::TimerRepeating timer;
     uint8_t subDivision = 0;
+
+    uint8_t gap = 0;
+    uint8_t gapIndex = 0;
 };
 
 void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind)
@@ -83,10 +87,18 @@ void BeatTimerStub::Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure
     NotifyObservers([bpm, beatsPerMeasure](auto& observer)
         { observer.Started(bpm, beatsPerMeasure); });
     timer.Start(
-        std::chrono::microseconds(60000000 / bpm / 12), [this]()
+        std::chrono::microseconds(60000000 / bpm / 12), [this, beatsPerMeasure]()
         {
-            NotifyObservers([this](auto& observer) { observer.Beat(subDivision); });
-            subDivision = (subDivision + 1) % 12; },
+            NotifyObservers([this](auto& observer) { observer.Beat(subDivision % 12, gapIndex != 0); });
+            ++subDivision;
+            if (subDivision == beatsPerMeasure.ValueOr(1) * 12)
+            {
+                subDivision = 0;
+                ++gapIndex;
+                if (gapIndex > gap)
+                    gapIndex = 0;
+            }
+        },
         infra::triggerImmediately);
 }
 
@@ -95,6 +107,11 @@ void BeatTimerStub::Stop()
     NotifyObservers([](auto& observer)
         { observer.Stopped(); });
     timer.Cancel();
+}
+
+void BeatTimerStub::Gap(uint8_t gap)
+{
+    this->gap = gap;
 }
 
 class SerialCommunication8Beat

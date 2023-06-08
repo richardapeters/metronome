@@ -15,7 +15,7 @@ namespace application
     public:
         using infra::Observer<BeatTimerObserver, BeatTimer>::Observer;
 
-        virtual void Beat(uint8_t subDivision) = 0;
+        virtual void Beat(uint8_t subDivision, bool gapped) = 0;
         virtual void Started(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure) = 0;
         virtual void Stopped() = 0;
     };
@@ -26,6 +26,7 @@ namespace application
     public:
         virtual void Start(uint16_t bpm, infra::Optional<uint8_t> beatsPerMeasure, uint8_t noteKind) = 0;
         virtual void Stop() = 0;
+        virtual void Gap(uint8_t gap) = 0;
     };
 }
 

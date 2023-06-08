@@ -32,11 +32,11 @@ namespace application
         return *viewingBitmap;
     }
 
-    void BeatPainter::Beat(uint8_t subDivision)
+    void BeatPainter::Beat(uint8_t subDivision, bool gapped)
     {
         // Invoked on interrupt context
 
-        if (subDivision % 12 == 0)
+        if (!gapped && subDivision % 12 == 0)
         {
             beatOn = true;
 

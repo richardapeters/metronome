@@ -9,6 +9,7 @@
 #include "metronome/views/ViewBeatsPerMeasure.hpp"
 #include "metronome/views/ViewBpm.hpp"
 #include "metronome/views/ViewDateEntry.hpp"
+#include "metronome/views/ViewGap.hpp"
 #include "metronome/views/ViewNoteKind.hpp"
 #include "metronome/views/ViewStart.hpp"
 #include "metronome/views/ViewTapMeasurement.hpp"
@@ -50,6 +51,18 @@ namespace application
     private:
         BeatController& beatController;
     };
+
+    class GapInteractor
+        : public ViewGapObserver
+    {
+    public:
+        GapInteractor(ViewGap& subject, BeatController& beatController);
+
+        virtual void SelectedGap(uint8_t gap);
+
+    private:
+        BeatController& beatController;
+    };
 }
 
 namespace main_
@@ -75,12 +88,14 @@ namespace main_
         services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalTop;
         application::ViewStart viewStart{ beatController, infra::Colour::lightGray };
         application::ViewTapMeasurement viewTapMeasurement{ bpmSelectionObserver, infra::Colour::lightGray, infra::Colour::darkGray };
-        services::TouchHorizontalLayout::WithMaxViews<2> touchHorizontalMid;
+        services::TouchHorizontalLayout::WithMaxViews<3> touchHorizontalMid;
         services::TouchPanel::WithView<application::ViewBeatsPerMeasure> viewBeatsPerMeasure{ infra::Colour::lightGray };
         services::TouchPanel::WithView<application::ViewNoteKind> viewNoteKind{ infra::Colour::lightGray };
+        services::TouchPanel::WithView<application::ViewGap> viewGap{ infra::Colour::lightGray };
         services::TouchButton::With<services::ViewButtonPanel::WithView<services::ViewCurrentTime>> viewCurrentTime;
         application::BeatsPerMeasureInteractor beatsPerMeasureInteractor{ viewBeatsPerMeasure.SubView(), beatController };
         application::NoteKindInteractor noteKindInteractor{ viewNoteKind.SubView(), beatController };
+        application::GapInteractor gapInteractor{ viewGap.SubView(), beatController };
 
         services::SettableTimerService& localTime;
         infra::Optional<services::TouchAligned::WithView<application::ViewDateEntry>> dateEntry;

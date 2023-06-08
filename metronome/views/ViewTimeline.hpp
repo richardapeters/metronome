@@ -29,7 +29,7 @@ namespace application
         virtual void NoteAdded(Note newNote) override;
 
         // Implementation of BeatTimerObserver
-        virtual void Beat(uint8_t subDivision) override;
+        virtual void Beat(uint8_t subDivision, bool gapped) override;
         virtual void Started(uint16_t bpm, infra::Optional<uint8_t> newBeatsPerMeasure) override;
         virtual void Stopped() override;
 

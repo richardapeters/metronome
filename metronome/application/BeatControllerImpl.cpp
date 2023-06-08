@@ -70,4 +70,9 @@ namespace application
         if (Running())
             Start();
     }
+
+    void BeatControllerImpl::SelectedGap(uint8_t gap)
+    {
+        beatTimer.Gap(gap);
+    }
 }

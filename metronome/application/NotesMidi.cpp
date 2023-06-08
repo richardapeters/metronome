@@ -14,7 +14,7 @@ namespace application
                     ReceivedByte(byte); });
     }
 
-    void NotesMidi::Beat(uint8_t subDivision)
+    void NotesMidi::Beat(uint8_t subDivision, bool gapped)
     {
         if (subDivision == 0)
         {
