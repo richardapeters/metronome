@@ -25,7 +25,7 @@ jobs:
         with:
           key: ${{ github.job }}-windows-latest
           variant: sccache
-      - uses: lukka/run-cmake@71d20a810daaf5340669b8cce5c9fe583780e147
+      - uses: lukka/run-cmake@c2b72aff009141774c5a5fabe74ea46c8c04d9c4
         with:
           configurePreset: "host"
           buildPreset: "host-RelWithDebInfo"
@@ -54,12 +54,12 @@ jobs:
       - uses: hendrikmuhs/ccache-action@fba817f3c0db4f854d7a3ee688241d6754da166e # v1.2.8
         with:
           key: ${{ matrix.preset}}-${{ matrix.configuration }}
-      - uses: lukka/run-cmake@71d20a810daaf5340669b8cce5c9fe583780e147
+      - uses: lukka/run-cmake@c2b72aff009141774c5a5fabe74ea46c8c04d9c4
         with:
           configurePreset: "host"
           buildPreset: "host-${{ matrix.configuration }}"
           configurePresetAdditionalArgs: "['-DCMAKE_C_COMPILER_LAUNCHER=ccache', '-DCMAKE_CXX_COMPILER_LAUNCHER=ccache']"
-      - uses: lukka/run-cmake@71d20a810daaf5340669b8cce5c9fe583780e147
+      - uses: lukka/run-cmake@c2b72aff009141774c5a5fabe74ea46c8c04d9c4
         with:
           configurePreset: "${{ matrix.preset }}"
           buildPreset: "${{ matrix.preset }}-${{ matrix.configuration }}"
